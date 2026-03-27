@@ -1,25 +1,22 @@
-## Section 3: The Infinite Field
-The Spatial Strategy
-Practically, it was impossible to generate enough individual blades to cover an entire world. To create the illusion of vastness, I divided the field into a grid system. As the camera crossed a grid boundary, the entire vertex group snapped forward. This "infinite scrolling" trick ensured the grass always surrounded the character, no matter how far they traveled. I used the world position as a deterministic seed to generate parameters for each blade's shape, color, and local terrain elevation, which guaranteed consistency during each grid snap.
+GPU-Driven Spawning
+In False Earth, flowers bloomed dynamically as energy waves expanded across the terrain. To handle this efficiently, I moved the spawning logic entirely into a compute shader. For every new instance, a unique position, lifetime, and seed were assigned.
 
-The GPU Data Pipeline
-In WebGPU, I stored the parameters for each blade in a structured storage buffer, computing the data in a compute shader before passing it into the rendering pipeline. This was a significant upgrade from WebGL, where I previously had to use complex FBO hacks. To achieve a natural look, I adopted the Voronoi clustering method to group blades into clumps. Each blade's data package included:
+To manage a constant stream of growth without expensive CPU readbacks, I implemented a circular buffer using a storage index. By applying atomicAdd to a global index and using a mod operator against the maximum instance count, the system automatically recycled the oldest flowers from the pool. This ensured a continuous lifecycle that remained performant even during heavy interaction.
 
-Position and normal
+The Lifecycle State Machine
+Each active flower progressed through four distinct stages: Delay, Grow, Keep, and Die. I mapped these stages directly to the VAT playback progress (0.0 to 1.0):
 
-Type variation (width and height)
+Delay: The dormant period before the growth began.
 
-Bending and facing angle
+Grow: The animated progress scaled from 0 to 1, triggering the blooming VAT sequence.
 
-Wind strength and seeds for each blade/clump
+Keep: The flower remained at its final animated frame (1.0).
 
-Pushing force interaction
+Die: The progress reversed from 1 back to 0, causing the flower to wither and shrink.
 
-Vertex Deformation
-The blades were rendered using simple plane geometries. The bending logic was based on a Bézier control point method. To add life to the field, I introduced a sine-wave sway effect that increased in intensity toward the tip. However, to maintain visual stability, I faded the wind intensity for the blades at a farther distance. To ensure the blades stuck to the terrain surface, I computed the tilting angle based on shared terrain parameters used across the grass, flowers, and character elevation. I also applied a view-dependent tilt to make the grass blades appear thicker when viewed from the side.
+Once the entire sequence was complete, the flower was marked as inactive, making its slot available for the next spawning cycle.
 
-Interaction
-For the push interaction, I passed the character's position into the shader and gave each blade an outward force based on its distance to the character. In False Earth, cosmic beams fell from the sky, sending energy waves across the ground. I built a wave system that tracked position, startTime, maxRadius, and lifeTime for each wave. This buffer was passed to the grass shader to trigger synchronized pushing and glow effects.
+Advanced Rendering & Visuals
+In the vertex shader, I retrieved the animated positions by sampling the VAT textures based on the computed frame index. To prevent a "cookie-cutter" look, I applied size variations to each instance using its unique seed.
 
-Rendering
-After computing the vertices properly, I moved on to the rendering of the blades. Each blade was composed of a plane without any texture. To enhance the structure of its shape, I tweaked the normals to create a "fake" rim and midrib effect. For the colors, I added a small amount of randomness based on the clump and blade seeds, ensuring each clump had subtle differences. For performance, I only applied Ambient Occlusion (AO) based on the height of the blade. Finally, I added a desaturation effect for distant blades to create atmospheric depth.
+Similar to the grass, I aligned each flower to the terrain's surface, applied wind effects, and calculated an interaction force based on its proximity to the character. Although the petals and stems shared the same mesh, I encoded a mask into the vertex colors during preprocessing. This allowed me to colorize and animate the materials separately within a single draw call. For the final touch, I added a periodic glow and a Fresnel effect to give the flora a mystical, ethereal quality.
