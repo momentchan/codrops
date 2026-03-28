@@ -19,7 +19,8 @@ Procedural Grass 🌱
 Realistic grass was the soul of False Earth. While many web projects already featured beautiful grass, I wanted blades that could react realistically to lighting and interaction. Inspired by the Ghost of Tsushima team's technical breakdown, I built a procedural system that gave me total control over every blade's shape, color, and movement.
 
 The WebGL Limit 🧱
-However, I quickly hit a performance bottleneck. As I increased the number of flowers and grass blades, the frame rate dropped dramatically. I realized that to achieve the scale I wanted, I had to move to WebGPU. This was my first time using WebGPU and TSL, and I was amazed by how it simplified tasks that were once incredibly complex in WebGL.
+However, I quickly hit a performance bottleneck. As I increased the number of flowers and grass blades, the frame rate dropped dramatically. Beyond raw draw calls, I struggled with the limitations of GPGPU in WebGL; handing FrameBuffer(FBO) read/write operations for complex GPU computations was incredibly clunky and counter-intuitive.
+I realized that to achieve the scale I had in mind, I had to move to WebGPU. This was my first time using WebGPU and TSL, and I was amazed by how it simplified everything. Instead of FBO hacks, I could use Storage Buffer to manage data directly on the GPU. This shift allowed me to focus on the logic of the world rather than fighting the limitations of the API.
 
 
 # The Infinite Field
