@@ -55,7 +55,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Realistic grass was the soul of <em>False Earth</em>. While many web projects already feature beautiful grass, I wanted blades that could react realistically to lighting and interaction. Inspired by the <strong><em>Ghost of Tsushima</em> </strong>team's <a href="https://gdcvault.com/play/1027033/Advanced-Graphics-Summit-Procedural-Grass">technical breakdown</a>, I built a procedural system that gave me total control over every blade's shape, color, and movement.</p>
+<p>Realistic grass was the soul of <em>False Earth</em>. While many web projects already feature beautiful grass, I wanted blades that could react realistically to lighting and interaction. Inspired by the <em>Ghost of Tsushima</em> team’s <a href="https://gdcvault.com/play/1027033/Advanced-Graphics-Summit-Procedural-Grass">technical breakdown</a>, I built a procedural system that gave me total control over every blade’s shape, color, and movement.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:video {"id":113219} -->
@@ -67,7 +67,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>However, I quickly hit a performance bottleneck. As I increased the number of flowers and grass blades, the frame rate dropped dramatically. Beyond raw draw calls, I struggled with the limitations of GPGPU in WebGL; handling FrameBuffer (FBO) read/write operations for complex GPU computations was incredibly clunky and counter-intuitive.<br>I realized that to achieve the scale I had in mind, I had to move to WebGPU. This was my first time using WebGPU and TSL, and I was amazed by how it simplified everything. Instead of FBO hacks, I could use Storage Buffers to manage data directly on the GPU. This shift allowed me to focus on the logic of the world rather than fighting the limitations of the API.</p>
+<p>However, I quickly hit a performance bottleneck. As I increased the number of flowers and grass blades, the frame rate dropped dramatically. Beyond raw draw calls, I struggled with the limitations of GPGPU in WebGL; handling framebuffer (FBO) read/write operations for complex GPU computations was incredibly clunky and counter-intuitive.<br>I realized that to achieve the scale I had in mind, I had to move to WebGPU. This was my first time using WebGPU and TSL, and I was amazed by how it simplified everything. Instead of FBO hacks, I could use storage buffers to manage data directly on the GPU. This shift allowed me to focus on the logic of the world rather than fighting the limitations of the API.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -79,7 +79,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Practically, it is impossible to generate enough individual blades to cover an entire world. To create the illusion of vastness, I divided the field into a <strong>grid system</strong>. As the camera crosses a grid boundary, the entire vertex group "snaps" forward. This <strong>infinite scrolling</strong> ensures the grass always surrounds the character, no matter how far they travel. I used the world position as a <strong>deterministic seed</strong> to generate parameters for each blade’s shape, color, and local elevation, which guarantees visual consistency during each grid snap.</p>
+<p>Practically, it is impossible to generate enough individual blades to cover an entire world. To create the illusion of vastness, I divided the field into a <strong>grid system</strong>. As the camera crosses a grid boundary, the entire vertex group snaps forward. This <strong>infinite scrolling</strong> trick keeps the grass surrounding the character no matter how far they travel. I used world position as a <strong>deterministic seed</strong> to generate parameters for each blade’s shape, color, and local elevation, which stays consistent across every grid snap.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:video {"id":113290} -->
@@ -91,7 +91,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>In WebGPU, I stored the parameters for each blade in a structured <strong>Storage Buffer</strong>, computed the data in a compute shader, and passed it into the rendering pipeline. This was a significant upgrade from WebGL, where I previously had to use complex FBO hacks. To achieve a natural distribution, I adopted a <strong>Voronoi clustering method</strong> to group blades into organic clumps. Each blade’s <strong>data package</strong> includes:</p>
+<p>In WebGPU, I stored the parameters for each blade in a structured <strong>storage buffer</strong>, computed the data in a compute shader, and passed it into the rendering pipeline. This was a significant upgrade from WebGL, where I previously had to use complex FBO hacks. To achieve a natural distribution, I adopted a <strong>Voronoi clustering</strong> approach to group blades into organic clumps. Each blade’s <strong>data package</strong> includes:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -126,15 +126,15 @@
 
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Bending &amp; Sway</strong>: The bending logic is based on a <strong>3rd-order Bézier control point method</strong>. To add life to the field, I introduced a <strong>dual-frequency sine-wave sway</strong> that increases in intensity toward the tip. To maintain visual stability and prevent flickering (aliasing), I faded the wind intensity for blades in the distance.</li>
+<li><strong>Bending &amp; Sway</strong>: The bending logic is based on a <strong>third-order Bézier control-point</strong> method. To add life to the field, I introduced a <strong>dual-frequency sine-wave sway</strong> that increases in intensity toward the tip. To maintain visual stability and reduce flicker (aliasing), I faded the wind intensity for blades in the distance.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Terrain Alignment</strong>: To ensure the blades stay perfectly on the ground, I computed a <strong>tilting angle</strong> based on shared terrain parameters. By unpacking the terrain normal from the storage buffer, I ensured the grass, flowers, and the character all react to the same elevation data.</li>
+<li><strong>Terrain Alignment</strong>: To keep blades flush with the ground, I computed a <strong>tilting angle</strong> based on shared terrain parameters. By unpacking the terrain normal from the storage buffer, I kept the grass, flowers, and character aligned with the same elevation data.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>The "Thick" Illusion</strong>: Since the blades are 2D planes, I applied a <strong>view-dependent tilt</strong> to make the grass blades appear thicker when viewed from the side, preventing them from "disappearing" at grazing camera angles.</li>
+<li><strong>The "Thick" Illusion</strong>: The blades are 2D planes, so I applied a <strong>view-dependent tilt</strong> to make them appear thicker when viewed from the side, preventing them from disappearing at grazing angles.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -143,11 +143,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>For the push interaction, I passed the character's position into the shader and gave each blade an <strong>outward force</strong> based on its distance to the character. This creates a realistic "flattening" effect (using a quadratic power t<sup>2</sup>) that is strongest at the tip and zero at the root.</p>
+<p>For push interaction, I passed the character’s position into the shader and gave each blade an <strong>outward force</strong> based on its distance to the character. This creates a realistic flattening effect (using a quadratic falloff, t<sup>2</sup>) that is strongest at the tip and zero at the root.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>In <em>False Earth</em>, cosmic beams fall from the sky, sending energy waves across the ground. I built a <strong>Wave System</strong> that tracks the following parameters for each wave:</p>
+<p>In <em>False Earth</em>, cosmic beams fall from the sky and send energy waves across the ground. I built a <strong>wave system</strong> that tracks the following parameters for each wave:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -182,11 +182,11 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Performance-First Shading</strong>:  For performance, I applied <strong>Ambient Occlusion (AO)</strong> based solely on the height of the blade, darkening the roots to create depth.</li>
+<li><strong>Performance-First Shading</strong>: For performance, I applied <strong>ambient occlusion (AO)</strong> based solely on the height of the blade, darkening the roots to create depth.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Atmospheric Depth</strong>: Finally, I added a <strong>desaturation effect</strong> for distant blades to create  atmospheric perspective and depth.</li>
+<li><strong>Atmospheric Depth</strong>: Finally, I added a <strong>desaturation effect</strong> for distant blades to create atmospheric perspective and depth.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -195,7 +195,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>In <em>False Earth</em>, flowers bloom dynamically as energy waves expand across the terrain. To handle this efficiently, I moved the spawning logic entirely into a <strong>Compute Shader</strong>, assigning each instance a unique position, lifetime, and seed.</p>
+<p>In <em>False Earth</em>, flowers bloom dynamically as energy waves expand across the terrain. To handle this efficiently, I moved the spawning logic entirely into a <strong>compute shader</strong>, assigning each instance a unique position, lifetime, and seed.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -203,7 +203,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>To keep flowers spawning continuously without expensive CPU readbacks, I implemented a <strong>Circular Buffer</strong> with a storage index.</p>
+<p>To keep flowers spawning without costly CPU readbacks, I implemented a <strong>circular buffer</strong> backed by a storage index.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -212,7 +212,7 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Automatic Recycling</strong>: The index wraps using a modulo of the maximum instance count. This automatically recycles the oldest flowers, ensuring a smooth lifecycle even during heavy interaction.</li>
+<li><strong>Automatic Recycling</strong>: The index wraps with modulo against the maximum instance count, recycling slots so the lifecycle stays smooth even during heavy interaction.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -221,7 +221,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Every active flower progresses through a state machine driven by its normalized age. I mapped these stages directly to the VAT playback progress:</p>
+<p>Every active flower moves through a state machine driven by normalized age. I mapped each stage to VAT playback progress:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
@@ -234,16 +234,16 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Keep</strong>: The flower remains at its final animated frame 1 for its peak duration.</li>
+<li><strong>Keep</strong>: The flower holds the final animated frame (1.0) for its peak duration.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Die</strong>: The progress reverses or scales down, causing the flower to wither and shrink back to 0.</li>
+<li><strong>Die</strong>: Progress reverses or scales down so the flower withers and shrinks back toward 0.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>Once the sequence is complete, the instance is marked as inactive, making its slot available for the next spawning cycle.</p>
+<p>When the sequence finishes, the instance is marked inactive and its slot is free for the next spawn.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -251,7 +251,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>In the vertex shader, I retrieved animated positions by sampling the VAT textures with the computed frame index. To make the field feel organic, I applied randomized size variations using each instance's unique seed.</p>
+<p>In the vertex shader, VAT textures are sampled using the computed frame index to reconstruct animated positions. Per-instance size variation, derived from each instance’s seed, reduces visible repetition across the field.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -267,37 +267,37 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Even with computation moved to compute shaders, rendering millions of blades is still a heavy task. The most straightforward improvement is <strong>Frustum Culling</strong>—only drawing what camera sees. However, since the blade position are generated on the GPU, traditional CPU-based culling is impossible. This is where <strong>WebGPU</strong> <strong>Indirect Draw</strong> becomes essential. </p>
+<p>Even with much of the work on the GPU, drawing millions of blades remains costly. The standard approach is <strong>frustum culling</strong>: submit only geometry visible to the camera. Because blade positions are generated on the GPU, traditional CPU-side culling is not available. <strong>WebGPU indirect drawing</strong> addresses this limitation.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><strong>Indirect Draw</strong> allows the GPU to determine the draw count for the rendering pipeline by reading from an <strong>Indirect Storage Buffer</strong>. This buffer is a <strong>Uint32Array</strong> containing five specific values:</p>
+<p><strong>Indirect draw</strong> allows the GPU to set draw counts for the pipeline by reading an indirect buffer. In this project it is represented as a <code>Uint32Array</code> with five fields:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li><strong>vertexCount</strong> : Number of vertices per instance.</li>
+<li><code>vertexCount</code>: Number of vertices per instance.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>instanceCount</strong> : The number of instances to draw (Atomic).</li>
+<li><code>instanceCount</code>: Number of instances to draw (updated atomically).</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>firstVertex</strong> : Offset in the vertex buffer.</li>
+<li><code>firstVertex</code>: Offset in the vertex buffer.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>firstInstance</strong> : Offset in the instance buffer.</li>
+<li><code>firstInstance</code>: Offset in the instance buffer.</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>offset</strong> : Base instance offset.</li>
+<li><code>offset</code>: Base instance offset.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>In Three.js TSL, we simply target the geometry with this buffer</p>
+<p>In Three.js TSL, I wired the geometry to that buffer as follows:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -309,7 +309,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>For example, when you have 1M instances but only 50K are visible, you can tell the GPU: "Only draw 50K instances from the list." To achieve this, I created a <strong>visibleIndicesBuffer</strong> to store the mapping to the original data. In compute shader, if an instance passes the culling test, its index is added to this buffer and the <strong>instanceCount</strong> is incremented.</p>
+<p>Consider one million instances where only fifty thousand are visible: the draw path should include only those visible instances. I use a <code>visibleIndicesBuffer</code> that maps compact draw indices back to the original instance IDs. During the compute pass, each visible instance writes its index into this buffer, and <code>instanceCount</code> is incremented atomically.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -324,7 +324,7 @@ If( isVisible, () => {
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>Then, in vertex shader, I retrieve the actual data by looking up the real index from the v<strong>isibleIndicesBuffer</strong>:</p>
+<p>Then, in the vertex shader, the real instance index is resolved from <code>visibleIndicesBuffer</code>:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -333,7 +333,7 @@ const data = grassData.element(trueIndex);</code></pre>
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>By filtering instances before they hit the rendering pipeline, the vertex shader only processes what is actually on screen, drastically improving performance.</p>
+<p>Filtering before the draw pass limits vertex shading to on-screen instances, which reduces rendering cost substantially.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -341,27 +341,27 @@ const data = grassData.element(trueIndex);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Taking this further, I used the same indirect logic to implement <strong>Level of Details (LOD)</strong>. Instead of one global draw buffer, I created multiple buffers for different mesh densities. I defined an array of<strong> LODBufferConfig</strong>, which specifies the segment count for the mesh and this distance range they belong to.</p>
+<p>I reused the same indirect pattern for <strong>level of detail (LOD)</strong>. Instead of one global draw buffer, I used several buffers for different mesh densities. An array of <code>LODBufferConfig</code> entries defines segment counts and the distance band each LOD covers.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The compute shader calculates the distance from each blade to the camera. Based on this distance, it "routes" the instance index into the appropriate LOD bucket. Forground blades go into a high-detail buffer (more segments), while distant blades go into low-detail buffer (less planes). This allows False Earth to maintain a dense horizon without wasting triangles on pixels the user can barely see. </p>
+<p>The compute pass measures each blade’s distance to the camera and assigns the instance index to the appropriate LOD bucket. Foreground blades use a high-detail buffer (more segments); distant blades use a lighter buffer (fewer segments). The result is a dense horizon without spending triangles on pixels that contribute little detail.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>To make the boundary between each LOD less visible, I added the jittered offset to the distance calculation. This jitters the transition points for each instance, preventing hard, artificial circle lines on the ground. </p>
+<p>To soften LOD boundaries, I apply a per-instance jitter to the distance test, which reduces visible circular banding at transitions.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><strong>Non-blocking Startup: Aync Compilation</strong></p>
+<p><strong>Non-blocking Startup: Async Compilation</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>"In WebGL, shader compilation is a wall. You hit it, and the screen freezes until the GPU finishes. In <em>False Earth</em>, I wanted the intro to be seamless. I wrapped the core components in an <code class="">AsyncCompile</code> provider that uses WebGPU’s <strong><code>compileAsync</code></strong>. This moves the heavy lifting to a background thread, keeping the loading animation smooth as the world wakes up.</p>
+<p>In WebGL, shader compilation often blocks the main thread until the driver finishes. For <em>False Earth</em>, I wanted the introduction to stay responsive during load. I wrapped the core components in an <code>AsyncCompile</code> provider that uses WebGPU’s <code>compileAsync</code>, moving compilation off the critical path so the loading animation remains smooth while shaders finish building.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>It’s not just about compiling, though; it’s about <strong>Bandwidth Throttling</strong>. If you dump 2,000 roses and 100,000 blades of grass onto the GPU at the exact same millisecond, the driver might panic. My <code class="">AsyncCompile</code> system uses a global queue—it compiles, joins a line, and waits for its turn to upload. This <strong>'idle → compiled → uploading → done'</strong> flow ensures the GPU pipeline stays healthy and responsive.</p>
+<p>Compilation scheduling alone is not enough; <strong>bandwidth throttling</strong> matters as well. Uploading very large batches—for example, thousands of flower instances and a six-figure grass count—in a single frame can overwhelm the driver. I route compilation and upload through a global queue so work proceeds in sequence instead of hitting the GPU all at once. The <em>idle → compiled → uploading → done</em> sequence keeps the pipeline stable and responsive.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -373,11 +373,11 @@ const data = grassData.element(trueIndex);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>In <em>False Earth</em>, I implemented a First-Person View (FPV) mode to let users step into the feet of the astronaut and experience the world with maximum immersion. To simulate the view through a helmet visor, I added custom <strong>Chromatic Aberration</strong> and <strong>Vignette</strong> effect. </p>
+<p>In <em>False Earth</em>, I implemented a first-person (FPV) mode so visitors can experience the world from the astronaut’s perspective. To suggest a helmet visor, I added custom <strong>chromatic aberration</strong> and <strong>vignette</strong> effects.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>In the TSL framework, accessing node-based color and depth textures is remarkably straightforward. You can modify them and route them to the final output with far more flexibility than traditional post-processing passes.</p>
+<p>In TSL, color and depth are exposed as nodes, so they can be modified and routed into the final composite with more flexibility than a fixed chain of fullscreen passes.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -392,11 +392,11 @@ pp.outputNode = finalNode;</code></pre>
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>I also added Depth of Field (DOF) to create a cinematic blur for distant objects. However, a common issue arose: thin, glowing components like the cosmic beam would alse get blurred, losing their sharp, energetic look. </p>
+<p>I also added depth of field (DOF) to blur distant geometry in a cinematic way. A side effect is that thin, emissive elements such as the cosmic beam were blurred as well, which softened their sharp, high-energy appearance.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>To solve this, I separated the beams into a dedicated <code>beamScene</code>. In the post-processing stage, I performed a <strong>Depth Comparison</strong> between the beam texture and the main scene texture. By calculating the difference , I could precisely control the occlusion—ensuring the beams stay sharp while naturally dipping behind the terrain.</p>
+<p>To correct this, I render beams in a separate <code>beamScene</code>. In post-processing, I compare depth from the beam pass with the main scene depth and use the difference to composite occlusion: beams remain sharp where they should read as foreground, while still occluding correctly behind terrain.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -410,11 +410,11 @@ finalNode = finalNode.add(beamColor.mul(beamOcclusion));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>In a digital world, sound is the anchor that makes the character's presense feel visceral. The sound of a step is played when character moves on the grass.  I bound the triggering of sound with animation to make sure they are always synchronized no matter if the charater is walking or running.   </p>
+<p>Sound grounds the character’s presence in the scene. Footsteps are triggered when the character moves on the grass. Trigger timing is tied to the locomotion animation so playback stays aligned at walk and run speeds.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I prepared different sound clips and also applied subtle deturns to every sound to make them sounds more natural.  The distance rollover effect is also considered; the volume varies based on the distance to the camera. I built my own audio system based on native Web Audio API, so it doesnt increase the computing stress even when many sounds are triggered at the same time. </p>
+<p>I use several footstep variants with slight pitch variation per trigger to avoid obvious repetition. Volume attenuates with distance to the camera. The implementation is built directly on the Web Audio API, which keeps CPU overhead modest even with many concurrent one-shots.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -422,7 +422,7 @@ finalNode = finalNode.add(beamColor.mul(beamOcclusion));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I started my career as an interactive developer for physical digital art installations. Years ago, when I first encountered Three.js, I was blown away by how easily web graphics allowed people to interact across different platforms. </p>
+<p>I started my career as an interactive developer for physical digital art installations. Years ago, when I first encountered Three.js, I was blown away by how easily web graphics allowed people to interact across different platforms.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -430,7 +430,7 @@ finalNode = finalNode.add(beamColor.mul(beamOcclusion));</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><em>False Earth</em> is just one exploration of what's possible when you move away from traditaional constraints. As web graphics continue to advance, I am looking forward to exploring even more immersive storytelling and creating digital experiences that feel as tactile as the physical installations I once built.</p>
+<p>For me, <em>False Earth</em> is only one step in learning what I can build when I move away from the traditional constraints I used to treat as fixed. As web graphics continue to advance, I am looking forward to exploring even more immersive storytelling and creating digital experiences that feel as tactile as the physical installations.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":113213,"width":"838px","height":"auto","aspectRatio":"1.6064699715441066","sizeSlug":"large","linkDestination":"none"} -->
