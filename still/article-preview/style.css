@@ -1,0 +1,37 @@
+/* Local overlay only. Article type comes from Codrops main.css. */
+
+.preview-badge {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  background: #111;
+  color: #fff;
+  font: 12px/1.4 InterVariable, Inter, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ct-header {
+  display: none;
+}
+
+.media-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0 0 1.5rem;
+  padding: 3.2rem 1.25rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px dashed color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 4px;
+  font: 0.92rem/1.45 InterVariable, Inter, sans-serif;
+  opacity: 0.85;
+}
+
+.media-slot span {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
