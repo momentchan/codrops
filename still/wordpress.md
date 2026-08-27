@@ -95,11 +95,11 @@ const litColor = mix(
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: a cool wash, soft at the edge, like ink on paper. That is the ground shadow I had in mind for <em>Still</em>.</p>
+<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: an ink wash, soft at the edge, uneven inside, like paint thinned on paper. That is the ground shadow I had in mind for <em>Still</em>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":119968,"width":"380px","height":"auto","sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-12-735x900.png" alt="Akira — Kaneda and the bike on flat white, grounded by a colored ink-wash shadow" class="wp-image-119968" style="width:380px;height:auto"/></figure>
+<figure class="wp-block-image size-large is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-12-735x900.png" alt="Akira — Kaneda and the bike on flat white, grounded by a soft ink-wash shadow" class="wp-image-119968" style="width:380px;height:auto"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
