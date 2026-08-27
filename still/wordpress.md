@@ -19,10 +19,6 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <p><a href="https://github.com/momentchan/r3f-akira">Source Code</a></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Intro</h2>
-<!-- /wp:heading -->
-
 <!-- wp:paragraph -->
 <p><em>Still</em> is chapter 3 of an interactive astronaut story I have been making on the web (<a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">previous Codrops article</a>). With each chapter I push the story forward and experiment visually and technically.</p>
 <!-- /wp:paragraph -->
@@ -53,22 +49,26 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
-<!-- wp:paragraph -->
-<p>The suit, the backpack, the flowers, and the stems share that language. Quantized light. A drawn edge. Ink on the ground. Paper over the frame.</p>
-<!-- /wp:paragraph -->
-
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Quantized Lighting</strong></h4>
+<h4 class="wp-block-heading"><strong>Woodblock Toon</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The astronaut and the backpack share one woodblock toon. I remap N·L through a soft window (<code>thresholdLow</code> / <code>thresholdHigh</code>), then <code>floor</code> it into a few <strong>color levels</strong>. Shadow and highlight are tints mixed on the albedo — not a realistic light response.</p>
+<p>The astronaut and the flowers share the same banded light, but they run through different shaders — the suit uses a toon material on textured albedo, while petals and stems use a vertex-color material built for VAT instancing. The quantized step below is what ties them together.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The light part starts with N·L — how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
 <pre class="wp-block-code"><code>const ndl = max(dot(N, L), 0.0);
+const thresholdNoise = fbm3(positionWorld.mul(thresholdNoiseScale))
+  .sub(0.5)
+  .mul(thresholdNoiseStrength);
 const preShade = clamp(
-  ndl.sub(thresholdLow).div(thresholdHigh.sub(thresholdLow)),
+  ndl.sub(thresholdLow.add(thresholdNoise))
+    .div(thresholdHigh.sub(thresholdLow)),
   0.0,
   1.0,
 );
@@ -83,26 +83,11 @@ const litColor = mix(
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>Cast shadow is merged into that same quantized step, not multiplied on top. An area already at the shadow floor stays there. Only lit bands get pulled down. That keeps the print from going muddy.</p>
+<p>The ink edge is where the pipelines split. On the character, it comes from an inverted hull — a second mesh, back-face, pushed out along the normal. Petals skip that approach because every VAT head is instanced hundreds of times, and wrapping each in a second mesh would blow the budget while still tracing the wrong silhouette, since the deforming mesh is not the petal cutout. The shape already lives in a mask texture, so I discard outside it and draw the rim in the shader with <code>fwidth</code> on that same mask — one texture for both shape and edge. Stems get a view-facing rim in the shader as well, with no extra geometry.</p>
 <!-- /wp:paragraph -->
-
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Inverted-Hull Outline</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>The white halo is a second mesh, back-face, pushed out along the normal. Same trick as a lot of toon games. On this suit it reads as a sketch line, not a glow.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:code -->
-<pre class="wp-block-code"><code>material.side = THREE.BackSide;
-material.positionNode = positionLocal.add(
-  normalLocal.normalize().mul(outlineWidth),
-);</code></pre>
-<!-- /wp:code -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: suit close-up — quantized bands + inverted-hull outline] --></figure>
+<figure class="wp-block-image"><!-- [IMAGE: woodblock toon — character hull outline vs petal mask edge] --></figure>
 <!-- /wp:image -->
 
 <!-- wp:heading {"level":4} -->
@@ -110,7 +95,15 @@ material.positionNode = positionLocal.add(
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>A photoreal contact shadow would fight the print. The ground is the same beige as the sky, so the plane has no edge. On that paper I still need a stain under him.</p>
+<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: a cool wash, soft at the edge, like ink on paper. That is the ground shadow I had in mind for <em>Still</em>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":119968,"width":"380px","height":"auto","sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-12-735x900.png" alt="Akira — Kaneda and the bike on flat white, grounded by a colored ink-wash shadow" class="wp-image-119968" style="width:380px;height:auto"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>A photoreal contact shadow would fight the print. The ground is the same beige as the sky, so the plane has no visible edge — but on that paper I still need a stain under him.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -178,7 +171,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:video -->
 
 <!-- wp:paragraph -->
-<p>Flowers and stems use the same quantized levels and tints. Petals get veins as ink strokes and a mask edge. Stems get a view-facing edge, not a hull outline. One art direction.</p>
+<p>On top of that base, petals get veins as ink strokes and a posterized base-to-tip gradient. One art direction.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->

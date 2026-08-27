@@ -1,0 +1,59 @@
+---
+description: Voice and prose rules for Codrops articles (Still, False Earth, etc.)
+globs: still/**/*.md,false-earth/**/*.md
+alwaysApply: false
+---
+
+# Codrops article tone
+
+Reference: [False Earth article](https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/) and `still/tone.md`.
+
+## Voice
+
+- Frank, direct, conversational — like explaining the work to another dev.
+- First person for process and experiments: "I found", "I remap", "I tried".
+- Personal is fine when understated. Say what you noticed or liked; don't perform emotion.
+
+## Story vs author
+
+- Story sections: narrate what happens ("he stopped", "flowers bloom around him").
+- Do not write author intent as story ("I wanted him to stop", "I wrote him to…").
+
+## Avoid
+
+- Fancy or academic phrasing ("shares the same base", "tints mixed on the albedo").
+- Sales copy ("what sold it for me", "Not a black CG blob", "I kept coming back to").
+- Staccato fragment chains ("Not one trick. A stack." / "Two layers, not one shader.").
+- Over-explaining the demo setup ("demo sphere", "I isolate on a sphere") — describe the effect.
+- "Cartoon" — use **anime**, **Japanese print**, **ink**, **woodblock**.
+
+## Sentence flow
+
+- Prefer connected sentences over many short ones.
+- Use semicolons and subordinate clauses; one thought per paragraph where possible.
+
+## Technical prose
+
+- Name things plainly once, then use shorthand (define N and L before N·L).
+- Code blocks for non-obvious work only; skip textbook tricks (e.g. inverted-hull outline).
+- Teach core technique first, refinements after (e.g. quantized light → code → noise → outline split).
+
+## Vocabulary for this series
+
+- **Japanese print** / **ink** / **woodblock toon** — aesthetic
+- **astronaut** — character in story voice; **character** ok in technical bits
+- **Still** — chapter title, italicized
+
+## Examples
+
+**Too performative:**
+> I kept coming back to this poster. That shadow is what sold it for me. Not a black CG blob.
+
+**Better:**
+> While I was looking at *Akira* for the look of this chapter, I found this poster. The shadow underneath is the part I keep noticing — a cool wash, soft at the edge, like ink on paper.
+
+**Too academic:**
+> N·L goes through a soft window, then floor into color levels. Shadow and highlight are tints mixed on the albedo.
+
+**Better:**
+> The light part starts with N·L — how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between `thresholdLow` and `thresholdHigh`, then `floor` it into **color levels**.
