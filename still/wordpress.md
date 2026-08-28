@@ -95,7 +95,7 @@ const litColor = mix(
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: an ink wash, soft at the edge, uneven inside, like paint thinned on paper. That is the ground shadow I had in mind for <em>Still</em>.</p>
+<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: a wash, soft at the edge, uneven inside, barely following the silhouette, like paint thinned on paper. Everything else in this scene is built to look drawn, so the shadow could not be the one thing that still looks rendered.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":119968,"width":"380px","height":"auto","sizeSlug":"large","linkDestination":"none"} -->
@@ -103,23 +103,24 @@ const litColor = mix(
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>A photoreal contact shadow would fight the print. The ground is the same beige as the sky, so the plane has no visible edge — but on that paper I still need a stain under him.</p>
+<p>The shadow map gives me a gradient — dark under him, fading out at the edges. A gradient does not look painted, so I cut it at a chosen level with <code>smoothstep</code> and get a shape with a definite edge instead. From there, one fractal noise does two different jobs. Added to the shadow before the cut, it moves where the cut lands, so the edge comes out ragged. Multiplied in after the cut, it leaves the edge alone and breaks up the inside — pigment pooling rather than a flat fill. Because both read the same noise, the places where the edge bulges out are also the places where the fill goes thin: spread further, so less colour left behind.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I sample the directional <code>shadow()</code>, then treat the mask like ink: a noisy <strong>wash</strong> (spread, warp, fractal noise) and a darker <strong>contour</strong> along the silhouette (<code>fwidth</code> plus a little edge noise). The blob is drawn, not rendered as CG.</p>
+<p>The darker <strong>contour</strong> is a second read of that same gradient. Rather than tracing the shape I just made, I pick a level and draw wherever the shadow sits close to it, so the line can fall inside the blob or outside it depending on <code>edgeAt</code>. A finer noise nudges that level from pixel to pixel so the line wavers, and <code>fwidth</code> ties its thickness to how fast the gradient is changing, which holds a steady width on screen wherever it runs — a pen stroke, not a modelled dark rim. Wash and line then combine with <code>max</code>, so the stronger of the two wins each pixel and neither darkens the other. That is what keeps it reading as one mark instead of two layers.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
 <pre class="wp-block-code"><code>const amt = shadow(light).oneMinus();
 const ink = fbm2(positionWorld.xz.mul(washScale));
-const fill = smoothstep(spread, spread.add(edgeSoft), amt.add(ink.mul(edgeWarp)));
-const wash = fill.mul(float(1.0).sub(ink.mul(washNoise).max(0.0)));
+const fill = smoothstep(washAt, washAt.add(washSoft), amt.add(ink.mul(washBleed)));
+const wash = fill.mul(float(1.0).sub(ink.mul(washMottle).max(0.0)));
 
-const w = fwidth(amt).mul(contourWidth).max(0.0001);
-const edge = float(1.0).sub(smoothstep(0.0, w, amt.sub(edgeAt).abs()));
-const shColor = mix(washColor, contourColor, edge);
-return mix(bg, shColor, max(wash.mul(washStr), edge.mul(contourStr)));</code></pre>
+const wobble = mx_noise_float(positionWorld.xz.mul(contourScale)).mul(contourWobble);
+const penWidth = fwidth(amt).mul(contourWidth).max(0.0001);
+const line = float(1.0).sub(smoothstep(0.0, penWidth, amt.sub(contourAt.add(wobble)).abs()));
+const shColor = mix(washColor, contourColor, line);
+return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></pre>
 <!-- /wp:code -->
 
 <!-- wp:image -->
