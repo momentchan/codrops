@@ -190,6 +190,23 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <p>For the flower animation I used the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a> Blender pack. Its carefully designed Geometry Nodes produce motion that feels vivid and graceful, which matches the feeling I want to get across. I turn that motion into VAT, the same technique I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made that handles the whole workflow directly in Blender.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:image {"id":119999,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-15-1200x711.png" alt="" class="wp-image-119999"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>On top of that baked VAT, petals leave a few at a time — each shrinking toward its own centre, then lifting and fanning out. The look comes from <a href="https://www.teamlab.art/w/flowersandpeople-hour/"><em>Flowers and People</em></a> by teamLab, while the feeling I want to get across is a flower at its fullest just before it falls. The mesh already comes as separate islands, so I group vertices by connectivity and pack a petal id and a pivot vertex into vertex colour; a hash of that id staggers the timing and the lift, so they don't all leave together. I combine VAT with a procedural pass so I get both: the baked motion, and the freedom to invent on top.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>const petalId = color.g; // island id, 0..1
+const pivot = sampleVAT(color.b, frame); // same vertex, current bloom frame
+const startJitter = fract(sin(petalId * 127.1) * 43758.5453);
+const t = clamp((shed - startJitter * stagger) / (1.0 - stagger), 0.0, 1.0);
+const ease = t * t * (3.0 - 2.0 * t);
+const shrunk = pivot.add(basePos.sub(pivot).mul(1.0 - ease));</code></pre>
+<!-- /wp:code -->
+
 <!-- wp:image -->
 <figure class="wp-block-image"><!-- [IMAGE or VIDEO: Blender Geo Nodes bloom vs the VAT flower head] --></figure>
 <!-- /wp:image -->
@@ -207,7 +224,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 const to = /* lean azimuth × stemLength */;
 const bend = /* seeded sideways offset */;
 const curve = new THREE.CatmullRomCurve3(
-  [
+  &#91;
     from,
     from.clone().lerp(to, 0.25).add(bend),
     from.clone().lerp(to, 0.75).add(bend),
@@ -224,7 +241,7 @@ const scale = (1 - (1 - radiusAttenuation) * t) + baseFlare * (1 - t) ** 3;</cod
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>If(uv().x.greaterThan(growth), () => Discard());
+<pre class="wp-block-code"><code>If(uv().x.greaterThan(growth), () =&gt; Discard());
 const rScale = startScale + growth * (1.0 - startScale);
 grown = center.add(positionLocal.sub(center).mul(rScale));</code></pre>
 <!-- /wp:code -->
@@ -238,8 +255,19 @@ grown = center.add(positionLocal.sub(center).mul(rScale));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Leaves are instanced along that tube. That is one plant; packing them into a single draw waits until there are many.</p>
+<p>The leaf starts as a modeled mesh. I bend its vertices in the shader: a curl along the blade, tight at first, then easing open as it grows.</p>
 <!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Then I sit a few of them on the stem. Each <code>t</code> is a seeded sample along the middle of the curve, sorted so they climb in order; they alternate around the shaft and sit on the tube’s surface at that <code>t</code>. Placement is baked — unlike the flower head, they do not ride the growing end. The same 0 to 1 that grows the stem reveals the leaf after the front passes that <code>t</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>curve.getPointAt(t, P);
+pos.copy(P).addScaledVector(outward, stemRadius * radiusScale);
+const growFrac = smoothstep(attachT, attachT + GROW_WINDOW, stemGrow);
+placed = attach.add(leafPos.mul(growFrac));</code></pre>
+<!-- /wp:code -->
 
 <!-- wp:image -->
 <figure class="wp-block-image"><!-- [IMAGE: leaves instanced on the stem] --></figure>
@@ -250,8 +278,12 @@ grown = center.add(positionLocal.sub(center).mul(rScale));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong>. Readers of <a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">that article</a> already know this machine. The new part of death is <strong>petal shed</strong>. Each petal shrinks toward its own centre and lifts, so the head comes apart instead of the whole flower scaling down. Then the stem retracts.</p>
+<p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong> — and Die itself is shed, then retract. One age drives the plant. In Delay the stem rests; flower and leaf are not in yet. Grow is the stem’s 0–1: the flower rides that tip as the VAT opens, while each leaf waits on the shaft, then uncurls after the front has passed. Keep holds — stem stands, flower full, leaves open. Then <strong>petal shed</strong> runs while the stem still stands and the leaves stay; after that the stem goes 1→0, and the leaves go with it.</p>
 <!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><!-- [IMAGE: still/images/plant/lifecycle-timeline.png] --></figure>
+<!-- /wp:image -->
 
 <!-- wp:video -->
 <figure class="wp-block-video"><!-- [VIDEO: one plant — bloom → petal shed → stem retract] --></figure>
