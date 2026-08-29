@@ -36,7 +36,7 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The visual exploration for this chapter started with a Japanese anime — <em>Akira</em>, a biker in orange chasing his friend through Neo-Tokyo after the city has already fallen once. I was drawn to how graphic it felt: bold shapes, flat color, a black outline, light in a few clear steps — a world inked rather than photographed. Digging further, I found the same habits in traditional Japanese print: flat fields, dirty paper, an edge that is ink. I wanted to see if that language could hold up in a 3D scene, so I started building from there.</p>
+<p>The visual exploration for this chapter started with a Japanese anime — <em>Akira</em>, a cyberpunk sci-fi story about a teenage biker gang member who develops dangerous psychic powers in a dystopian Neo-Tokyo. I was drawn to how graphic it felt: color laid on in flats, a sharp outline, still frames that look drawn rather than photographed. Digging further, I found the same way of painting in traditional Japanese work like this — the flowers done the same way: flat color, a clear edge, like a painting. I wanted to see if that language could hold up as a print look in a 3D scene, so I started building from there.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -136,28 +136,43 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <!-- /wp:image -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Silk Canvas</strong></h4>
+<h4 class="wp-block-heading"><strong>Silk Weave</strong></h4>
 <!-- /wp:heading -->
 
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":119992,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-14-465x900.png" alt="" class="wp-image-119992"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":119991,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-13-484x900.png" alt="" class="wp-image-119991"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->
+
 <!-- wp:paragraph -->
-<p>Last, the whole frame is paper. A fullscreen pass lays a warp/weft weave, a warm tint, and blotch stains over the scene. Turn it off and you are looking at a 3D viewport again. Turn it on and the beige world holds together as a print.</p>
+<p>I was looking at two Japanese folding screens of hollyhocks: Sakai Hōitsu's (1801) and Ogata Kenzan's. The ground is the part I keep noticing — a faint weave, a grid like threads, and marks that sit like stains, uneven enough that it feels painted by hand. That is the feeling I am chasing.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I put that weave over the whole frame because on those screens the grid and the stains sit in the ground of the painting, not on a single object. <code>screenUV</code> is scaled into thread cells with <code>threadCount</code>, then hash-jittered by <code>irregularity</code> so the grid does not look machine-made. <code>warp</code> and <code>weft</code> are the thread cross-section, high on the fiber and low in the groove; a checker mixes which one sits on top. <code>threadVariation</code> shifts each fiber's tone. <code>blotch</code> is slower noise, multiplied in as stains. Fabric and stain multiply, so they darken the whole frame together.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>const warp = pow(abs(sin(x.mul(PI))), sharpness);
+<pre class="wp-block-code"><code>const coord = screenUV.mul(vec2(aspect, 1.0)).mul(threadCount);
+const x = coord.x.add(hash(floor(coord.y)).sub(0.5).mul(irregularity));
+const y = coord.y.add(hash(floor(coord.x)).sub(0.5).mul(irregularity));
+const warp = pow(abs(sin(x.mul(PI))), sharpness);
 const weft = pow(abs(sin(y.mul(PI))), sharpness);
-const weave = mix(warp, weft, mod(floor(x).add(floor(y)), 2.0));
-const fabric = float(1.0).sub(strength.mul(float(1.0).sub(weave)));
+const checker = mod(floor(x).add(floor(y)), 2.0);
+const weave = mix(warp, weft, checker);
+const fabric = clamp(float(1.0).sub(strength.mul(float(1.0).sub(weave))).add(threadTone), 0.0, 1.0);
+const blotch = float(1.0).sub(blotchStrength.mul(smoothstep(0.45, 0.95, stain)));
 const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:code -->
 
 <!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO or IMAGE pair: silk-weave post off vs on] --></figure>
+<figure class="wp-block-video"><!-- [VIDEO or IMAGE pair: silk weave off vs on] --></figure>
 <!-- /wp:video -->
-
-<!-- wp:paragraph -->
-<p>On top of that base, petals get veins as ink strokes and a posterized base-to-tip gradient. One art direction.</p>
-<!-- /wp:paragraph -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">The Field</h2>
