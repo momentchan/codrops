@@ -2,7 +2,7 @@
 Codrops title / subtitle (paste into the post header, not as H1 in the body):
 
 Title: Still: A Japanese Print Look and a Generative Garden in WebGPU
-Subtitle: Building chapter 3 of an interactive astronaut series — anime-flat shading, ink shadows, and plants that bloom around a resting figure, then climb it.
+Subtitle: Building chapter 3 of an interactive astronaut series: anime-flat shading, ink shadows, and plants that bloom around a resting figure, then climb it.
 
 Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 --></p>
@@ -36,7 +36,7 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The visual exploration for this chapter started with a Japanese anime — <em>Akira</em>, a cyberpunk sci-fi story about a teenage biker gang member who develops dangerous psychic powers in a dystopian Neo-Tokyo. I was drawn to how graphic it felt: color laid on in flats, a sharp outline, still frames that look drawn rather than photographed. Digging further, I found the same way of painting in traditional Japanese work like this — the flowers done the same way: flat color, a clear edge, like a painting. I wanted to see if that language could hold up as a print look in a 3D scene, so I started building from there.</p>
+<p>The visual exploration for this chapter started with a Japanese anime, <em>Akira</em>, a cyberpunk sci-fi story about a teenage biker gang member who develops dangerous psychic powers in a dystopian Neo-Tokyo. I was drawn to how graphic it felt: color laid on in flats, a sharp outline, still frames that look drawn rather than photographed. Digging further, I found the same way of painting in traditional Japanese work like this — the flowers done the same way: flat color, a clear edge, like a painting. I wanted to see if that language could hold up as a print look in a 3D scene, so I started building from there.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -54,11 +54,11 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The astronaut and the flowers share the same banded light, but they run through different shaders — the suit uses a toon material on textured albedo, while petals and stems use a vertex-color material built for VAT instancing. The quantized step below is what ties them together.</p>
+<p>The astronaut and the flowers share the same banded light, but they run through different shaders: the suit uses a toon material on textured albedo, while petals and stems use a vertex-color material built for VAT instancing. The quantized step below is what ties them together.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The light part starts with N·L — how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
+<p>The light part starts with N·L, how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -83,7 +83,7 @@ const litColor = mix(
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>The ink edge is where the pipelines split. On the character, it comes from an inverted hull — a second mesh, back-face, pushed out along the normal. Petals skip that approach because every VAT head is instanced hundreds of times, and wrapping each in a second mesh would blow the budget while still tracing the wrong silhouette, since the deforming mesh is not the petal cutout. The shape already lives in a mask texture, so I discard outside it and draw the rim in the shader with <code>fwidth</code> on that same mask — one texture for both shape and edge. Stems get a view-facing rim in the shader as well, with no extra geometry.</p>
+<p>The ink edge is where the pipelines split. On the character, it comes from an inverted hull: a second mesh, back-face, pushed out along the normal. Petals skip that approach because every VAT head is instanced hundreds of times, and wrapping each in a second mesh would blow the budget while still tracing the wrong silhouette, since the deforming mesh is not the petal cutout. The shape already lives in a mask texture, so I discard outside it and draw the rim in the shader with <code>fwidth</code> on that same mask — one texture for both shape and edge. Stems get a view-facing rim in the shader as well, with no extra geometry.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -103,7 +103,7 @@ const litColor = mix(
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>The directional light already writes a shadow map. TSL's <code>shadow(light)</code> reads it on the ground; I invert that to <code>shade</code> — high under him, fading out at the edges. I flatten it with <code>smoothstep</code> so it reads as that wash: the inside holds a level, and the leftover band is the soft edge. One <code>noise</code> field does the rest — <code>washBleed</code> added before <code>smoothstep</code> so the blob barely follows the silhouette, <code>washMottle</code> multiplied in after so the inside is uneven, like paint thinned on paper. Same noise, so the edge and the fill stay consistent.</p>
+<p>The directional light already writes a shadow map. TSL's <code>shadow(light)</code> reads it on the ground; I invert that to <code>shade</code>, high under him, fading out at the edges. I flatten it with <code>smoothstep</code> so it reads as that wash: the inside holds a level, and the leftover band is the soft edge. One <code>noise</code> field does the rest: <code>washBleed</code> added before <code>smoothstep</code> so the blob barely follows the silhouette, <code>washMottle</code> multiplied in after so the inside is uneven, like paint thinned on paper. Same noise, so the edge and the fill stay consistent.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -128,7 +128,7 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>I want flower shadows on the character, but not on themselves. So I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity — it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
+<p>I want flower shadows on the character, but not on themselves. So I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity: it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -175,11 +175,94 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:video -->
 
 <!-- wp:heading -->
+<h2 class="wp-block-heading">One Plant</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The garden later grows from many copies of this plant. I start with one so you can see what it contains — a flower, a stem, leaves, and a life cycle — before they gather around him.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading"><strong>Flower</strong></h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>For the flower animation I used the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a> Blender pack. Its carefully designed Geometry Nodes produce motion that feels vivid and graceful, which matches the feeling I want to get across. I turn that motion into VAT, the same technique I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made that handles the whole workflow directly in Blender.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><!-- [IMAGE or VIDEO: Blender Geo Nodes bloom vs the VAT flower head] --></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading"><strong>Stem</strong></h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>That pack also builds the stem in Geometry Nodes, but those stems are already designed for specific flowers. I kept the idea — a curve, a tube — and did it procedurally in Three.js instead of baking the stem into VAT, so I could vary the shape. A seeded Catmull-Rom runs from the ground to a tip that leans and bends; I sweep a tube along it, then scale each ring so the base flares and the shaft tapers.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>const from = new THREE.Vector3(0, -BASE_BURY, 0);
+const to = /* lean azimuth × stemLength */;
+const bend = /* seeded sideways offset */;
+const curve = new THREE.CatmullRomCurve3(
+  [
+    from,
+    from.clone().lerp(to, 0.25).add(bend),
+    from.clone().lerp(to, 0.75).add(bend),
+    to,
+  ],
+  false,
+  'centripetal',
+);
+const scale = (1 - (1 - radiusAttenuation) * t) + baseFlare * (1 - t) ** 3;</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>I build the tube from that curve once. A value from 0 to 1 then drives two GPU steps: the fragment discards rings past the front along <code>uv.x</code>, and the vertex shader thickens the shaft from the centerline — wait, push out, stand, pull back. The flower head is placed on the CPU from that same value, so the bloom stays on the growing end.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>If(uv().x.greaterThan(growth), () => Discard());
+const rScale = startScale + growth * (1.0 - startScale);
+grown = center.add(positionLocal.sub(center).mul(rScale));</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><!-- [IMAGE: one stem, VAT head on the tip] --></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading"><strong>Leaf</strong></h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Leaves are instanced along that tube. That is one plant; packing them into a single draw waits until there are many.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><!-- [IMAGE: leaves instanced on the stem] --></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading"><strong>Lifecycle</strong></h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong>. Readers of <a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">that article</a> already know this machine. The new part of death is <strong>petal shed</strong>. Each petal shrinks toward its own centre and lifts, so the head comes apart instead of the whole flower scaling down. Then the stem retracts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:video -->
+<figure class="wp-block-video"><!-- [VIDEO: one plant — bloom → petal shed → stem retract] --></figure>
+<!-- /wp:video -->
+
+<!-- wp:heading -->
 <h2 class="wp-block-heading">The Field</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>VAT flowers already existed in <em>False Earth</em> — bloom and die baked into a texture, replayed on the GPU. Here they are not an infinite plane. They gather as masses next to a lying body, without a wreath around the silhouette.</p>
+<p>The garden is not an infinite plane. Plants gather as masses next to a lying body, without a wreath around the silhouette.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -207,7 +290,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Placement is not a golden-angle spiral. About one in seven flowers sit on a <strong>heart</strong> — a rejection sample against the density field. The rest <strong>hop</strong> a short fixed range off a heart. Head size and how far a flower can bloom both follow local density, not hop depth or a “primary” role. Dense core, fringe buds — like a real thicket, not a decorator ring.</p>
+<p>Placement is not a golden-angle spiral. About one in seven flowers sit on a <strong>heart</strong>, a rejection sample against the density field. The rest <strong>hop</strong> a short fixed range off a heart. Head size and how far a flower can bloom both follow local density, not hop depth or a “primary” role. Dense core, fringe buds, like a real thicket, not a decorator ring.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -223,7 +306,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Each plant is a procedural tube — taper, flare, lean — plus instanced leaves. The VAT head sits on the tip. Stems are packed into one draw, same instinct as instancing the grass in <em>False Earth</em>. I do not submit a hundred separate meshes.</p>
+<p>The plant is the same one. Stems are packed into one draw, same instinct as instancing the grass in <em>False Earth</em>. I do not submit a hundred separate meshes.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -240,36 +323,16 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Field value</strong>: Density at the slot — drives head size and bloom ceiling, not to shrink a living flower.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Stem shape</strong>: Length, radius, taper, flare, lean.</li>
+<li><strong>Field value</strong>: Density at the slot. It drives head size and bloom ceiling, not to shrink a living flower.</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
-
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>VAT Blooms, Again</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>The petal motion is not mine. It comes from the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers – Geo Nodes Curve Asset Pack</a> in Blender. Dahlia and rose (what you see in the field) are baked from that bloom cycle into position and normal textures. A Geo Nodes flower is too expensive to instance hundreds of times in the browser. VAT lets me replay it on the GPU. My work is the bake, the surround of the body, and the print look — not claiming I authored the animation.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE or VIDEO: Blender Geo Nodes bloom vs the same flower in the scene] --></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong>. Readers of <a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">that article</a> already know this machine. The new part of death is <strong>petal shed</strong>. Each petal shrinks toward its own centre and lifts, so the head comes apart instead of the whole flower scaling down. Then the stem retracts.</p>
-<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
 <p>When a plant finishes, it is not rebuilt. A clump <strong>heart</strong> has been wandering slowly inside its own pin — a hip flower never rehoms onto the backpack. The dead plant picks a heart on that pin and hops. Live flowers are never yanked. Occupancy follows the hearts; the density field stays put; geometry stays. The garden keeps changing while he stays still.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO: bloom → petal shed → hop elsewhere] --></figure>
+<figure class="wp-block-video"><!-- [VIDEO: a clump heart wandering — bloom → hop elsewhere] --></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
@@ -277,7 +340,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Nearby heads use the high VAT. Far heads use a low-poly bake. On desktop Blink, a compute pass plus <strong>indirect draw</strong> picks the band — same idea as the grass LOD in <em>False Earth</em>. On iPhone, that path double-filled both meshes and the flowers flickered. WebKit still does not like that atomic compact. I compact the visible list on the CPU and set <code>mesh.count</code>. It is not elegant. It is stable. Low-poly heads also feed the plant shadow map, so the stain on the suit does not need the full petal mesh.</p>
+<p>Nearby heads use the high VAT. Far heads use a low-poly bake. On desktop Blink, a compute pass plus <strong>indirect draw</strong> picks the band, the same idea as the grass LOD in <em>False Earth</em>. On iPhone, that path double-filled both meshes and the flowers flickered. WebKit still does not like that atomic compact. I compact the visible list on the CPU and set <code>mesh.count</code>. It is not elegant. It is stable. Low-poly heads also feed the plant shadow map, so the stain on the suit does not need the full petal mesh.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -289,11 +352,11 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The vines cannot be placed by hand. They have to feel grown, stay on the orange suit, and share the same print look.</p>
+<p>The vines cannot be placed by hand. They have to feel grown, stay on the orange suit, and share the same print look. Packed tubes, a growth front, and <strong>Delay, Grow, Keep, Die</strong> are the same instincts as the plant. The hard problem is wrapping that growth on a posed body.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I looked at <a href="https://github.com/mattatz/THREE.Tree">mattatz/THREE.Tree</a> for how a procedural plant <em>grows</em> — segment hierarchy, taper, a mesh that can reveal itself. I did not drop that generator into the scene. There is no recursive branching tree here. What I kept is a growth front along distance, packed tubes that taper, and thickness from how much load a route carries, not from generation count. The hard problem is wrapping that growth on a posed body.</p>
+<p>I looked at <a href="https://github.com/mattatz/THREE.Tree">mattatz/THREE.Tree</a> for how a procedural plant reveals itself: a mesh that can grow along its own length. I did not drop that generator into the scene. There is no recursive branching tree here. Thickness comes from how much load a route carries, not from generation count.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -305,7 +368,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Limb <strong>capsules</strong> give me regions (calf, forearm, torso, helmet) without unique code per mesh. I sample the posed surface for stations — area-weighted, not a UV grid. Helmet density is turned down. The visor should not vanish under vines.</p>
+<p>Limb <strong>capsules</strong> give me regions (calf, forearm, torso, helmet) without unique code per mesh. I sample the posed surface for stations, area-weighted, not a UV grid. Helmet density is turned down. The visor should not vanish under vines.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -349,7 +412,7 @@ const hit = bvh.raycastFirst(ray, THREE.DoubleSide, 0, rayOffset * 1.6);</code><
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>All tendril tubes are packed. Each segment stores a start and end distance along its tree. The same Delay / Grow / Keep / Die clock drives a growth front. A segment reveals with a smoothstep between its two distances — growth along the plant, not a VAT frame on a field instance.</p>
+<p>All tendril tubes are packed. Each segment stores a start and end distance along its tree. The same Delay / Grow / Keep / Die clock drives a growth front; the window is tree distance, not VAT age on a field instance. A segment reveals with a smoothstep between its two distances.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -395,7 +458,7 @@ const hit = bvh.raycastFirst(ray, THREE.DoubleSide, 0, rayOffset * 1.6);</code><
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I started as an interactive developer for physical installations. Three.js still feels like the same leap: a link, a browser, no special hardware. <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em> was the step into WebGPU — storage buffers, compute, an endless field.</p>
+<p>I started as an interactive developer for physical installations. Three.js still feels like the same leap: a link, a browser, no special hardware. <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em> was the step into WebGPU: storage buffers, compute, an endless field.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
