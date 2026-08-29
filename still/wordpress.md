@@ -103,22 +103,22 @@ const litColor = mix(
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>The shadow map gives me a gradient — dark under him, fading out at the edges. A gradient does not look painted, so I cut it at a chosen level with <code>smoothstep</code> and get a shape with a definite edge instead. From there, one fractal noise does two different jobs. Added to the shadow before the cut, it moves where the cut lands, so the edge comes out ragged. Multiplied in after the cut, it leaves the edge alone and breaks up the inside — pigment pooling rather than a flat fill. Because both read the same noise, the places where the edge bulges out are also the places where the fill goes thin: spread further, so less colour left behind.</p>
+<p>The directional light already writes a shadow map. TSL's <code>shadow(light)</code> reads it on the ground; I invert that to <code>shade</code> — high under him, fading out at the edges. I flatten it with <code>smoothstep</code> so it reads as that wash: the inside holds a level, and the leftover band is the soft edge. One <code>noise</code> field does the rest — <code>washBleed</code> added before <code>smoothstep</code> so the blob barely follows the silhouette, <code>washMottle</code> multiplied in after so the inside is uneven, like paint thinned on paper. Same noise, so the edge and the fill stay consistent.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The darker <strong>contour</strong> is a second read of that same gradient. Rather than tracing the shape I just made, I pick a level and draw wherever the shadow sits close to it, so the line can fall inside the blob or outside it depending on <code>edgeAt</code>. A finer noise nudges that level from pixel to pixel so the line wavers, and <code>fwidth</code> ties its thickness to how fast the gradient is changing, which holds a steady width on screen wherever it runs — a pen stroke, not a modelled dark rim. Wash and line then combine with <code>max</code>, so the stronger of the two wins each pixel and neither darkens the other. That is what keeps it reading as one mark instead of two layers.</p>
+<p>The darker <strong>contour</strong> is a drawn stroke from the same <code>shade</code>, wherever it is close to <code>contourShade</code>, sitting outside the wash instead of tracing it. A finer, separate noise lets the line break, so it does not run as one continuous edge. <code>fwidth</code> keeps whatever is left a steady width on screen. Wash and line combine with <code>max</code>, so the stronger of the two wins each pixel and neither darkens the other.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
-<pre class="wp-block-code"><code>const amt = shadow(light).oneMinus();
-const ink = fbm2(positionWorld.xz.mul(washScale));
-const fill = smoothstep(washAt, washAt.add(washSoft), amt.add(ink.mul(washBleed)));
-const wash = fill.mul(float(1.0).sub(ink.mul(washMottle).max(0.0)));
+<pre class="wp-block-code"><code>const shade = shadow(light).oneMinus();
+const noise = fbm2(positionWorld.xz.mul(washScale));
+const fill = smoothstep(washAt, washAt.add(washSoft), shade.add(noise.mul(washBleed)));
+const wash = fill.mul(float(1.0).sub(noise.mul(washMottle).max(0.0)));
 
-const wobble = mx_noise_float(positionWorld.xz.mul(contourScale)).mul(contourWobble);
-const penWidth = fwidth(amt).mul(contourWidth).max(0.0001);
-const line = float(1.0).sub(smoothstep(0.0, penWidth, amt.sub(contourAt.add(wobble)).abs()));
+const wobble = mx_noise_float(positionWorld.xz.mul(contourWobbleScale)).mul(contourWobble);
+const penWidth = fwidth(shade).mul(contourWidth).max(0.0001);
+const line = float(1.0).sub(smoothstep(0.0, penWidth, shade.sub(contourShade.add(wobble)).abs()));
 const shColor = mix(washColor, contourColor, line);
 return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></pre>
 <!-- /wp:code -->
@@ -127,28 +127,12 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <figure class="wp-block-image"><!-- [IMAGE: stylish ground shadow — ink wash + contour, not a soft PCF blob] --></figure>
 <!-- /wp:image -->
 
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Plant Shadows on the Suit</strong></h4>
-<!-- /wp:heading -->
-
 <!-- wp:paragraph -->
-<p>Flowers should fall on the orange fabric. If I use the same shadow map as the character, he shadows himself and the print dies. A second, plant-only light writes a map that contains plants and not the body. The toon shader reads that map. One extra pass. The picture stays graphic.</p>
+<p>I want flower shadows on the character, but not on themselves. So I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity — it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: flowers casting on the suit] --></figure>
-<!-- /wp:image -->
-
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Contact Dirt</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>The boots and backpack need to look like they have been on the ground, without a hard CG stripe. I bake a vertex mask from height above the shared ground plane, with a little deterministic noise on the boundary. The dirt texture is quantized like the lighting, and mixed only in shadow and near contact. It does not depend on the plants.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: ground contact dirt on boots / backpack] --></figure>
+<figure class="wp-block-image"><!-- [IMAGE: flowers casting on the character and backpack] --></figure>
 <!-- /wp:image -->
 
 <!-- wp:heading {"level":4} -->
