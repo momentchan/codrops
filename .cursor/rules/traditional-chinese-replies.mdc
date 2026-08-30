@@ -1,0 +1,14 @@
+---
+description: Reply to the user in Traditional Chinese (繁體中文)
+alwaysApply: true
+---
+
+# 回覆語言
+
+與使用者對話時，**一律使用繁體中文**（台灣用字習慣）。
+
+- 解釋、討論、建議、總結：繁體中文
+- 程式碼內 comment：仍用英文（專案慣例）
+- Codrops 文章（`wordpress.md` 等）：仍用英文
+
+勿混用簡體中文（例如：对比、程序、默认、视频）。

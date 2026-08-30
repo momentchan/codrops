@@ -19,9 +19,15 @@ Write the astronaut story as story. Save "I wanted / I wrote" for why you built 
 |-------|--------|
 | Academic shader talk | Plain names + code tokens |
 | Many short sentences | One flowing paragraph |
+| Short-sentence punches | Carry the thought in one sentence |
 | "Demo sphere" in article text | Name the effect |
 | "Cartoon" | Anime, Japanese print, ink |
 | Performative emotion | Understated personal ("I liked this shadow a lot" → "the part I keep noticing") |
+| Cute / idiomatic verbs for data | Say where it is stored |
+
+Do not write `sits on the plant object`, `stays put`, `lives on`, `baked at layout` when you mean a field on each plant, a value that does not change, or written once at layout. If a reader has to ask what the verb is doing, use the boring word: stored, written, does not change.
+
+Do not stack declarations. `That field is only a static layout; it does not move. This part is how flowers grow on it.` is three beats. Two things in the same paragraph are often just both true — join them with *and* or *while*, not *so* unless one actually causes the other. Write `The density field is the static layout, and this part is how flowers grow on it.` If a period makes you tap your foot, join the clauses. Semicolon punches (`X; it does not Y`) are the same fault.
 
 ## Structure (Codrops)
 

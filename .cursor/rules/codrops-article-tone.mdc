@@ -29,14 +29,16 @@ Reference: [False Earth article](https://tympanus.net/codrops/2026/04/21/false-e
 
 ## Sentence flow
 
-- Prefer connected sentences over many short ones.
-- Use semicolons and subordinate clauses; one thought per paragraph where possible.
+- Prefer connected sentences over many short ones. One thought per paragraph where possible.
+- Join clauses with and / while / where — not a stack of declarations (`X. It does not Y.` / `X; it does not Y.`). Use *so* only when one thing causes the next.
+- If a period makes a beat, the sentence is too short. Semicolon punches are the same fault.
 
 ## Technical prose
 
 - Name things plainly once, then use shorthand (define N and L before N·L).
 - Code blocks for non-obvious work only; skip textbook tricks (e.g. inverted-hull outline).
 - Teach core technique first, refinements after (e.g. quantized light → code → noise → outline split).
+- Do not use cute verbs for data (`sits on`, `stays put`, `lives on`, `baked at layout`). Say stored, written, or does not change. If the verb needs explaining, it is the wrong verb.
 
 ## Vocabulary for this series
 

@@ -281,32 +281,30 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong> — and Die itself is shed, then retract. One age drives the plant. In Delay the stem rests; flower and leaf are not in yet. Grow is the stem’s 0–1: the flower rides that tip as the VAT opens, while each leaf waits on the shaft, then uncurls after the front has passed. Keep holds — stem stands, flower full, leaves open. Then <strong>petal shed</strong> runs while the stem still stands and the leaves stay; after that the stem goes 1→0, and the leaves go with it.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: still/images/plant/lifecycle-timeline.png] --></figure>
+<!-- wp:image {"id":120005,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/lifecycle-timeline-1200x800.png" alt="" class="wp-image-120005"/></figure>
 <!-- /wp:image -->
-
-<!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO: one plant — bloom → petal shed → stem retract] --></figure>
-<!-- /wp:video -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">The Field</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The garden is not an infinite plane. Plants gather as masses next to a lying body, without a wreath around the silhouette.</p>
+<p>Scattering copies at random around the astronaut reads as noise. I wanted a layout that feels grown: masses that thicken and thin, with bare ground between them, like a thicket that grew there. Drawings like these are what I built toward — dense hubs, a soft fall-off.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>The layout rule is simple: the system should feel intentional without becoming visible. If you can count the clusters and get four, the layout failed.</p>
-<!-- /wp:paragraph -->
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":120010,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-19-505x900.png" alt="" class="wp-image-120010"/></figure>
+<!-- /wp:image -->
 
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Four Anchors</strong></h4>
-<!-- /wp:heading -->
+<!-- wp:image {"id":120007,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/image-16-602x900.png" alt="" class="wp-image-120007"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p>I derive four anchors from the posed body and the backpack: <strong>hip</strong>, <strong>left hand</strong>, <strong>left boot</strong>, <strong>backpack</strong>. An anchor does not mean a flower grows there. It raises the probability of vegetation in the neighbourhood. The probability field stays put. Neighbouring fields merge. Bare ground survives between them.</p>
+<p>The field is a probability map first, placement second. Anchors raise the chance of plants around the body, and a warped field turns that into irregular masses. Hearts sit in those masses and wander slowly, while the density field stays put. Flowers <strong>hop</strong> off a heart, and when a plant dies the flower hops again the same way.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -314,7 +312,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Each anchor is an elongated falloff, not a circle. I sum them, warp the sample point so the blobs are irregular, punch <strong>bare patches</strong>, then run a hard MeshBVH keep-out so stems never sit inside the suit. The body is a star shape. A circular hole cannot carve that. Closest-point distance can.</p>
+<p>The anchors are <strong>hip</strong>, <strong>left hand</strong>, <strong>left boot</strong>, and <strong>backpack</strong>. Each one only raises the chance of plants nearby; they stay where the pose put them, neighbouring fields can merge, and each falloff is an ellipse along the limb. I warp the sample first so the shape is uneven, then add the anchors and clamp so overlaps become one mass. Points under the body or the pack I drop with the posed MeshBVH, which I use again later for the tendrils. After that I leave <strong>bare patches</strong> so it does not fill in like a carpet.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -322,11 +320,15 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Placement is not a golden-angle spiral. About one in seven flowers sit on a <strong>heart</strong>, a rejection sample against the density field. The rest <strong>hop</strong> a short fixed range off a heart. Head size and how far a flower can bloom both follow local density, not hop depth or a “primary” role. Dense core, fringe buds, like a real thicket, not a decorator ring.</p>
+<p>The density field is the static layout, and this part is how flowers grow on it. I place <strong>hearts</strong> first — clump centres, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until it sticks. The hearts wander slowly on their own, and the density field stays put.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A flower <strong>hops</strong> by taking a short random step off a heart, then I keep that point only if the density field accepts it, the same check as the heart. When a plant dies the flower hops again the same way, so the clumps stay around the hearts as those hearts wander. Once a flower has a spot, head size and how far it can open follow local density. Rose is the quieter shape, so it is common and can fill the mass, while dahlia is brighter and busier, so I keep that one rare.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: wide — masses at hip / hand / boot / backpack, not a ring] --></figure>
+<figure class="wp-block-image"><!-- [IMAGE: wide — masses at hip / hand / boot / backpack, irregular rather than circular] --></figure>
 <!-- /wp:image -->
 
 <!-- wp:image -->
@@ -338,163 +340,102 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The plant is the same one. Stems are packed into one draw, same instinct as instancing the grass in <em>False Earth</em>. I do not submit a hundred separate meshes.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Each plant’s <strong>data package</strong> includes:</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Seed and type</strong>: Dahlia or rose, plus color variation.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Anchor and clump</strong>: Which pin and heart mass it belongs to.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Field value</strong>: Density at the slot. It drives head size and bloom ceiling, not to shrink a living flower.</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
-
-<!-- wp:paragraph -->
-<p>When a plant finishes, it is not rebuilt. A clump <strong>heart</strong> has been wandering slowly inside its own pin — a hip flower never rehoms onto the backpack. The dead plant picks a heart on that pin and hops. Live flowers are never yanked. Occupancy follows the hearts; the density field stays put; geometry stays. The garden keeps changing while he stays still.</p>
+<p>Stems are packed into one draw, the same instinct as instancing the grass in <em>False Earth</em>. Each tube is built once. What still moves is written into a DataTexture for the GPU each frame: how far the stem has come, a little sway, and a world offset and yaw so a respawn can move without remeshing. What does not change is stored on the CPU, on each plant as a JavaScript object: seed, flower type, which anchor and heart it belongs to, and how far the flower can open, written once when the field is laid out from the density at that spot.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:video -->
 <figure class="wp-block-video"><!-- [VIDEO: a clump heart wandering — bloom → hop elsewhere] --></figure>
 <!-- /wp:video -->
 
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>LOD on Mobile</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>Nearby heads use the high VAT. Far heads use a low-poly bake. On desktop Blink, a compute pass plus <strong>indirect draw</strong> picks the band, the same idea as the grass LOD in <em>False Earth</em>. On iPhone, that path double-filled both meshes and the flowers flickered. WebKit still does not like that atomic compact. I compact the visible list on the CPU and set <code>mesh.count</code>. It is not elegant. It is stable. Low-poly heads also feed the plant shadow map, so the stain on the suit does not need the full petal mesh.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>The field stays off the body on purpose. What <em>does</em> climb him is a different system.</p>
-<!-- /wp:paragraph -->
-
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Generative Tendrils</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The vines cannot be placed by hand. They have to feel grown, stay on the orange suit, and share the same print look. Packed tubes, a growth front, and <strong>Delay, Grow, Keep, Die</strong> are the same instincts as the plant. The hard problem is wrapping that growth on a posed body.</p>
+<p>I added tendrils to connect the garden to the astronaut: the field grows around him, and a second system grows across the suit. The paths need to feel grown, follow the print look, and be generated from the posed meshes.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I looked at <a href="https://github.com/mattatz/THREE.Tree">mattatz/THREE.Tree</a> for how a procedural plant reveals itself: a mesh that can grow along its own length. I did not drop that generator into the scene. There is no recursive branching tree here. Thickness comes from how much load a route carries, not from generation count.</p>
+<p>This section follows how one of those tendrils is made from geometry rather than hand-authored as a curve: I choose a place for it to touch the suit, build its local wrap, route that contact across the mesh to the ground, and then hand the resulting tree to the growth system. First I will describe how the branches are represented; then I will walk through the surface-routing pipeline that creates them.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Hosts and Capsules</strong></h4>
+<h4 class="wp-block-heading"><strong>Tendril Trees</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Two hosts: the body and the backpack. Most of the budget goes to the body (about 90 / 10). This is a fine contact layer, not coverage — a few hundred awake tendrils, not a coat.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Limb <strong>capsules</strong> give me regions (calf, forearm, torso, helmet) without unique code per mesh. I sample the posed surface for stations, area-weighted, not a UV grid. Helmet density is turned down. The visor should not vanish under vines.</p>
+<p>A field stem is one curve from ground to tip. A tendril tree joins packed tube segments under one <strong>tree</strong> and one growth clock, so a ground path can fork into several wraps while the whole structure grows as one path. I use the root-to-tip reveal idea from <a href="https://github.com/mattatz/THREE.Tree">mattatz/THREE.Tree</a>, while the branching here comes from surface routes and wrap targets. Routes taper toward the tips as their downstream load gets smaller. The wrap curves use one shared world-space spatial noise field, so nearby paths wobble together. Each wrap is a partial arc around its local guide for radial guides, while broad planar guides use a surface stroke, and both are offset slightly from the suit.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Rings and Feeders</strong></h4>
+<h4 class="wp-block-heading"><strong>How They Grow</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Each tendril is a partial ring around a limb, then a <strong>feeder</strong> that walks the surface from the ground (or from a trunk already on the mesh) and attaches that ring into a <strong>tree</strong>. Trees share one growth front: ground → branches → rings → hold → reverse back to the ground.</p>
+<p>The routing is easier to understand as two linked jobs. The <strong>MeshBVH</strong> handles geometric queries: it finds the suit surface for the wrap and checks each candidate. The <strong>surface graph</strong> handles connectivity: it provides the walk from the ground to the wrap's hitch. Together, the ground route and wrap curve form one tendril. The hitch is their handoff point: the ground route reaches it, and the wrap curve continues from it across the host surface. The steps below keep those jobs separate.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>A closest-point snap was not enough. On a calf it jumped to the other side. I start outside the limb and cast a ray inward, so the first hit is the surface on this radial side. If that fails, a local closest point is allowed only if it still faces the same way. Keeping a gap is better than a vine that tunnels through the suit.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:code -->
-<pre class="wp-block-code"><code>// Start outside the calf and cast inward.
-// First hit = this radial side, not the far side of the limb.
-const rayOffset = Math.max(capsuleRadius * 4, 0.28);
-rayOrigin.copy(center).addScaledVector(outward, rayOffset);
-const hit = bvh.raycastFirst(ray, THREE.DoubleSide, 0, rayOffset * 1.6);</code></pre>
-<!-- /wp:code -->
-
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: debug — capsules + wrap paths (rings vs feeders) on the posed body] --></figure>
-<!-- /wp:image -->
-
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: same angle, final tendril tubes] --></figure>
-<!-- /wp:image -->
-
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>A Pool of Routes</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>I build more paths than I show. Only about one in three is awake. When a tree dies and comes back, it can wake on a dormant route instead of retracing the same line forever. Nearby curves share a spatial noise field, so they look like one organism, not a pile of independent splines.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>One Draw, Tree Time</strong></h4>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>All tendril tubes are packed. Each segment stores a start and end distance along its tree. The same Delay / Grow / Keep / Die clock drives a growth front; the window is tree distance, not VAT age on a field instance. A segment reveals with a smoothstep between its two distances.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:code -->
-<pre class="wp-block-code"><code>function treeSegmentGrowth(growthFront, startDistance, endDistance) {
-  const span = Math.max(endDistance - startDistance, 1e-6);
-  const t = clamp((growthFront - startDistance) / span, 0, 1);
-  return t * t * (3 - 2 * t);
-}</code></pre>
-<!-- /wp:code -->
-
-<!-- wp:paragraph -->
-<p>Leaves inherit that packed age. A few <strong>plumera</strong> heads — also from the Geo Nodes pack, also VAT — bind onto awake rings and rebind when a route swaps. The field stays dahlia and rose. The suit gets a different flower.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Each tendril’s <strong>data package</strong> includes:</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Host and role</strong>: Body or backpack; ring or feeder.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Tree id</strong>: Shared growth front for the whole vine.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Path window</strong>: Start and end distance along that tree.</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li><strong>Wrap</strong>: Angle range, surface offset, load-based radius scale.</li>
-<!-- /wp:list-item --></ul>
+<!-- wp:list {"ordered":true} -->
+<ol><li><strong>Prepare the hosts</strong><p>I bake the posed body and backpack into host-space geometries, build one BVH for each, and turn their meshes into surface graphs.</p></li></ol>
 <!-- /wp:list -->
 
-<!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO: tree grow from ground → rings → hold → retract] --></figure>
-<!-- /wp:video -->
+<!-- wp:heading {"level":5} -->
+<h5 class="wp-block-heading"><strong>Wrap construction</strong></h5>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true,"start":2} -->
+<ol start="2"><li><strong>Choose a wrap station</strong><p>I sample the posed surface, assign each accepted point to an eligible guide, and store its normalized position <code>u</code> along that guide. Together, these values determine where the wrap begins.</p></li><li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions. These are the positions where the host surface will be tested.</p></li><li><strong>Project the candidates onto the host</strong><p>I project each candidate onto the host surface using the guide and host BVH. The accepted hits are ordered into the <strong>wrap curve</strong>, whose first point is the <strong>hitch</strong>.</p></li></ol>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":5} -->
+<h5 class="wp-block-heading"><strong>Ground route</strong></h5>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true,"start":5} -->
+<ol start="5"><li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>. This gives the ground route a discrete endpoint.</p></li><li><strong>Route from the ground</strong><p>I use ground-near vertices as Dijkstra sources and trace the shortest path to the graph hitch. That path becomes the <strong>ground route</strong>.</p></li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>Finally, the wrap curve meets the ground route at the graph hitch. Both parts share one tendril tree and one growth distance, so a single growth front reveals the tendril from the ground, through the hitch, and around the wrap.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><!-- [IMAGE: debug — capsules + wrap paths (ground paths vs wraps) on the posed body] --></figure>
+<!-- /wp:image -->
+
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading"><strong>Suit integration</strong></h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The body and backpack use the same host and routing pipeline. The backpack contributes a lighter contact layer, while the body carries most of the routes. Plumera heads bind to active wraps, giving the suit a different flower from the field.</p>
+<!-- /wp:paragraph -->
+
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">LOD on Mobile</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Nearby heads use the high VAT. Far heads use a low-poly bake, split at about two metres. On desktop Blink a compute pass plus <strong>indirect draw</strong> picks the band, the same idea as the grass LOD in <em>False Earth</em>. On iPhone that path double-filled both meshes and the flowers flickered — WebKit still does not like that atomic compact. I compact the visible list on the CPU, clear <code>setIndirect</code>, and set <code>mesh.count</code>. It is not elegant. It is stable. Low-poly heads also feed the plant shadow map, so the stain on the suit does not need the full petal mesh.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>slot.geometry.setIndirect(null);
+slot.mesh.count = compacted;</code></pre>
+<!-- /wp:code -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Conclusion</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I started as an interactive developer for physical installations. Three.js still feels like the same leap: a link, a browser, no special hardware. <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em> was the step into WebGPU: storage buffers, compute, an endless field.</p>
+<p>I started as an interactive developer for physical installations. Three.js still feels like the same leap: a link, a browser, no special hardware. <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em> was the step into WebGPU — storage buffers, compute, an endless field of grass.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><em>Still</em> is another step, not “more grass.” Each chapter in this series is a new expression. Here the astronaut finally stops. The picture language becomes Japanese print. A generative garden can colonize a body that is no longer trying to reach the horizon.</p>
+<p><em>Still</em> is another step, not more of that grass. Each chapter in this series is a new expression. Here the astronaut finally stops. The picture language becomes Japanese print. A generative garden can sit next to a body that is no longer trying to reach the horizon, and a second system can grow on the suit itself.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
