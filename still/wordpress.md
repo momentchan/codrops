@@ -86,9 +86,9 @@ const litColor = mix(
 <p>The ink edge is where the pipelines split. On the character, it comes from an inverted hull: a second mesh, back-face, pushed out along the normal. Petals skip that approach because every VAT head is instanced hundreds of times, and wrapping each in a second mesh would blow the budget while still tracing the wrong silhouette, since the deforming mesh is not the petal cutout. The shape already lives in a mask texture, so I discard outside it and draw the rim in the shader with <code>fwidth</code> on that same mask — one texture for both shape and edge. Stems get a view-facing rim in the shader as well, with no extra geometry.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: woodblock toon — character hull outline vs petal mask edge] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120027} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-toon-1.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Stylish Ground Shadow</strong></h4>
@@ -123,17 +123,17 @@ const shColor = mix(washColor, contourColor, line);
 return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: stylish ground shadow — ink wash + contour, not a soft PCF blob] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120062} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-shadow-1.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:paragraph -->
 <p>I want flower shadows on the character, but not on themselves. So I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity: it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: flowers casting on the character and backpack] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120075} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-shadow-on-character.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Silk Weave</strong></h4>
@@ -170,8 +170,8 @@ const blotch = float(1.0).sub(blotchStrength.mul(smoothstep(0.45, 0.95, stain)))
 const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO or IMAGE pair: silk weave off vs on] --></figure>
+<!-- wp:video {"id":120091} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-silk-2.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading -->
@@ -207,9 +207,9 @@ const ease = t * t * (3.0 - 2.0 * t);
 const shrunk = pivot.add(basePos.sub(pivot).mul(1.0 - ease));</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE or VIDEO: Blender Geo Nodes bloom vs the VAT flower head] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120086} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-flower-2.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Stem</strong></h4>
@@ -243,12 +243,13 @@ const scale = (1 - (1 - radiusAttenuation) * t) + baseFlare * (1 - t) ** 3;</cod
 <!-- wp:code -->
 <pre class="wp-block-code"><code>If(uv().x.greaterThan(growth), () =&gt; Discard());
 const rScale = startScale + growth * (1.0 - startScale);
-grown = center.add(positionLocal.sub(center).mul(rScale));</code></pre>
+grown = center.add(positionLocal.sub(center).mul(rScale));
+</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: one stem, VAT head on the tip] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120087} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-stem.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Leaf</strong></h4>
@@ -269,9 +270,9 @@ const growFrac = smoothstep(attachT, attachT + GROW_WINDOW, stemGrow);
 placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: leaves instanced on the stem] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120088} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-leaf.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Lifecycle</strong></h4>
@@ -327,25 +328,21 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <p>A flower <strong>hops</strong> by taking a short random step off a heart, then I keep that point only if the density field accepts it, the same check as the heart. When a plant dies the flower hops again the same way, so the clumps stay around the hearts as those hearts wander. Once a flower has a spot, head size and how far it can open follow local density. Rose is the quieter shape, so it is common and can fill the mass, while dahlia is brighter and busier, so I keep that one rare.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: wide — masses at hip / hand / boot / backpack, irregular rather than circular] --></figure>
-<!-- /wp:image -->
-
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE optional: debug density field vs the same frame with flowers] --></figure>
-<!-- /wp:image -->
+<!-- wp:video {"id":120094} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-field-1.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Packed Stems</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Stems are packed into one draw, the same instinct as instancing the grass in <em>False Earth</em>. Each tube is built once. What still moves is written into a DataTexture for the GPU each frame: how far the stem has come, a little sway, and a world offset and yaw so a respawn can move without remeshing. What does not change is stored on the CPU, on each plant as a JavaScript object: seed, flower type, which anchor and heart it belongs to, and how far the flower can open, written once when the field is laid out from the density at that spot.</p>
+<p>Stems are packed into one draw, the same instinct as instancing the grass in <em>False Earth</em>. Each plant keeps its static metadata on the CPU as a JavaScript object: its seed, flower type, anchor, heart, and opening range, written once when the field is laid out from the density at that spot. Each tube is built once. Every frame, I pack only the changing values — how far the stem has come, a little sway, and a world offset and yaw — into a DataTexture for the GPU to read, so a respawn can move without remeshing.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO: a clump heart wandering — bloom → hop elsewhere] --></figure>
-<!-- /wp:video -->
+<!-- wp:image {"id":120106,"width":"689px","height":"auto","aspectRatio":"2.259920968555574","sizeSlug":"full","linkDestination":"none","align":"center"} -->
+<figure class="wp-block-image aligncenter size-full is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/Group-46-3.png" alt="" class="wp-image-120106" style="aspect-ratio:2.259920968555574;width:689px;height:auto"/></figure>
+<!-- /wp:image -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Generative Tendrils</h2>
@@ -376,7 +373,9 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li><strong>Prepare the hosts</strong><p>I bake the posed body and backpack into host-space geometries, build one BVH for each, and turn their meshes into surface graphs.</p></li></ol>
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Prepare the hosts</strong><p>I bake the posed body and backpack into host-space geometries, build one BVH for each, and turn their meshes into surface graphs.</p></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
@@ -384,7 +383,17 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":2} -->
-<ol start="2"><li><strong>Choose a wrap station</strong><p>I sample the posed surface, assign each accepted point to an eligible guide, and store its normalized position <code>u</code> along that guide. Together, these values determine where the wrap begins.</p></li><li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions. These are the positions where the host surface will be tested.</p></li><li><strong>Project the candidates onto the host</strong><p>I project each candidate onto the host surface using the guide and host BVH. The accepted hits are ordered into the <strong>wrap curve</strong>, whose first point is the <strong>hitch</strong>.</p></li></ol>
+<ol start="2" class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Choose a wrap station</strong><p>I sample the posed surface, assign each accepted point to an eligible guide, and store its normalized position <code>u</code> along that guide. Together, these values determine where the wrap begins.</p></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions. These are the positions where the host surface will be tested.</p></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Project the candidates onto the host</strong><p>I project each candidate onto the host surface using the guide and host BVH. The accepted hits are ordered into the <strong>wrap curve</strong>, whose first point is the <strong>hitch</strong>.</p></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
@@ -392,17 +401,22 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":5} -->
-<ol start="5"><li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>. This gives the ground route a discrete endpoint.</p></li><li><strong>Route from the ground</strong><p>I use ground-near vertices as Dijkstra sources and trace the shortest path to the graph hitch. That path becomes the <strong>ground route</strong>.</p></li></ol>
+<ol start="5" class="wp-block-list"><!-- wp:list-item -->
+<li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>. This gives the ground route a discrete endpoint.</p></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>Route from the ground</strong><p>I use ground-near vertices as Dijkstra sources and trace the shortest path to the graph hitch. That path becomes the <strong>ground route</strong>.</p></li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
 <p>Finally, the wrap curve meets the ground route at the graph hitch. Both parts share one tendril tree and one growth distance, so a single growth front reveals the tendril from the ground, through the hitch, and around the wrap.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: debug — capsules + wrap paths (ground paths vs wraps) on the posed body] --></figure>
-<!-- /wp:image -->
-
+<!-- wp:video {"id":120095} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-tendril.mp4" playsinline></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading"><strong>Suit integration</strong></h4>
@@ -412,19 +426,17 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <p>The body and backpack use the same host and routing pipeline. The backpack contributes a lighter contact layer, while the body carries most of the routes. Plumera heads bind to active wraps, giving the suit a different flower from the field.</p>
 <!-- /wp:paragraph -->
 
-
 <!-- wp:heading -->
-<h2 class="wp-block-heading">LOD on Mobile</h2>
+<h2 class="wp-block-heading">Flower LOD Across Backends</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Nearby heads use the high VAT. Far heads use a low-poly bake, split at about two metres. On desktop Blink a compute pass plus <strong>indirect draw</strong> picks the band, the same idea as the grass LOD in <em>False Earth</em>. On iPhone that path double-filled both meshes and the flowers flickered — WebKit still does not like that atomic compact. I compact the visible list on the CPU, clear <code>setIndirect</code>, and set <code>mesh.count</code>. It is not elegant. It is stable. Low-poly heads also feed the plant shadow map, so the stain on the suit does not need the full petal mesh.</p>
+<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers, with the high- and low-poly meshes sharing the same per-head state. The new problem appeared on iPhone: the indirect path submitted both LOD meshes. Apple touch devices and the WebGL2 fallback therefore select the visible band on the CPU, clear the indirect buffer, and set <code>Mesh.count</code>.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:code -->
-<pre class="wp-block-code"><code>slot.geometry.setIndirect(null);
-slot.mesh.count = compacted;</code></pre>
-<!-- /wp:code -->
+<!-- wp:paragraph -->
+<p>The low-poly VAT mesh also serves as a shadow-only proxy on a separate render layer, so the shadow passes do not need the full petal geometry.</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Conclusion</h2>
@@ -442,6 +454,6 @@ slot.mesh.count = compacted;</code></pre>
 <p>He is still. The plants are not.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: final wide still of the resting figure in the garden] --></figure>
-<!-- /wp:image -->
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
