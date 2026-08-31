@@ -1,18 +1,14 @@
 <p><!--
 Codrops title / subtitle (paste into the post header, not as H1 in the body):
 
-Title: Still: A Japanese Print Look and a Generative Garden in WebGPU
-Subtitle: Building chapter 3 of an interactive astronaut series: anime-flat shading, ink shadows, and plants that bloom around a resting figure, then climb it.
+Title: Still: From Akira to Ink Wash, Building a Generative Garden in WebGPU
+Subtitle: Chapter three of an interactive astronaut series: translating flat color, sharp outlines, woven surfaces, and organic growth into a real-time scene.
 
 Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 --></p>
 
-<!-- wp:video -->
-<figure class="wp-block-video"><!-- [VIDEO: Still hero reel — lying astronaut, flower masses, tendrils, slow camera] --></figure>
-<!-- /wp:video -->
-
 <!-- wp:paragraph -->
-<p><a href="DEMO_URL">Live Demo</a></p>
+<p><a href="https://still.mingjyunhung.com/">Live Demo</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -20,23 +16,31 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><em>Still</em> is chapter 3 of an interactive astronaut story I have been making on the web (<a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">previous Codrops article</a>). With each chapter I push the story forward and experiment visually and technically.</p>
+<p><em>Still</em> is chapter three of an interactive, real-time astronaut story I have been making on the web (<a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">previous Codrops article</a>). Each chapter moves the story forward while giving me a new visual and technical question to explore.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First he was lost in <em><a href="https://drift-co0.pages.dev/">Drift</a></em>. Then he was running across <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, day after day, always moving, never arriving. After what felt like forever, he stopped and lay down — for the first time, with nowhere he needed to reach.</p>
+<p>First he was lost in <em><a href="https://drift.mingjyunhung.com/">Drift</a></em>. Then he was running across <em><a href="https://false-earth.mingjyunhung.com/">False Earth</a></em>, day after day, always moving, never arriving. After moving for what felt like forever, exhaustion finally catches up with him. He lies down, suspended between waking and sleep.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
-<figure class="wp-block-image"><!-- [IMAGE: the chapter tableau — flower masses around him, tendrils across the suit] --></figure>
-<!-- /wp:image -->
+<!-- wp:paragraph -->
+<p>In that half-dreaming state, time loses its edges. The ground, the flowers, and the suit begin to merge into one continuous landscape, while his thoughts drift between memory and the present.</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class="wp-block-heading">Japanese Print Style</h2>
+<h2 class="wp-block-heading">Building a Japanese Print Style</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The visual exploration for this chapter started with a Japanese anime, <em>Akira</em>, a cyberpunk sci-fi story about a teenage biker gang member who develops dangerous psychic powers in a dystopian Neo-Tokyo. I was drawn to how graphic it felt: color laid on in flats, a sharp outline, still frames that look drawn rather than photographed. Digging further, I found the same way of painting in traditional Japanese work like this — the flowers done the same way: flat color, a clear edge, like a painting. I wanted to see if that language could hold up as a print look in a 3D scene, so I started building from there.</p>
+<p>The visual exploration for this chapter started with <em>Akira</em>. I was drawn to its graphic discipline: flat color, sharp outlines, and frames that feel drawn rather than photographed. The stillness in those images mattered as much as the action.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I then looked toward traditional Japanese paintings and folding screens. Their floral forms, clear edges, woven grounds, and irregular ink-like marks create depth and atmosphere through shape, surface, and spacing rather than realism. I wanted to understand what gave these images their quiet, tactile quality.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I translated those observations into a real-time 3D scene. Toon shading keeps the planes broad, the ground shadow becomes an uneven ink wash, the silk weave supplies material grain, and procedural growth gives the flowers and tendrils an organic rhythm. The goal was not to reproduce any reference literally, but to understand what made the images feel composed, tactile, and alive.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -58,7 +62,7 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The light part starts with N·L, how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
+<p>The lighting starts with N·L, how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -91,7 +95,7 @@ const litColor = mix(
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Stylish Ground Shadow</strong></h4>
+<h4 class="wp-block-heading"><strong>Ink-Wash Ground Shadow</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -128,7 +132,7 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <!-- /wp:video -->
 
 <!-- wp:paragraph -->
-<p>I want flower shadows on the character, but not on themselves. So I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity: it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
+<p>I wanted the flowers to cast shadows on the character, but not on themselves. I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity: it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:video {"id":120075} -->
@@ -187,7 +191,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>For the flower animation I used the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a> Blender pack. Its carefully designed Geometry Nodes produce motion that feels vivid and graceful, which matches the feeling I want to get across. I turn that motion into VAT, the same technique I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made that handles the whole workflow directly in Blender.</p>
+<p>For the flower animation I used the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a> Blender pack. Its carefully designed Geometry Nodes produce motion that feels vivid and graceful, which is why I kept it as the base animation. I turn that motion into VAT, the same technique I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made that handles the whole workflow directly in Blender.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":119999,"sizeSlug":"large","linkDestination":"none"} -->
@@ -195,7 +199,7 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>On top of that baked VAT, petals leave a few at a time — each shrinking toward its own centre, then lifting and fanning out. The look comes from <a href="https://www.teamlab.art/w/flowersandpeople-hour/"><em>Flowers and People</em></a> by teamLab, while the feeling I want to get across is a flower at its fullest just before it falls. The mesh already comes as separate islands, so I group vertices by connectivity and pack a petal id and a pivot vertex into vertex colour; a hash of that id staggers the timing and the lift, so they don't all leave together. I combine VAT with a procedural pass so I get both: the baked motion, and the freedom to invent on top.</p>
+<p>On top of that baked VAT, petals leave a few at a time — each shrinking toward its own center, then lifting and fanning out. The shedding is inspired by <a href="https://www.teamlab.art/w/flowersandpeople-hour/"><em>Flowers and People</em></a> by teamLab: a flower at its fullest just before it falls. The mesh already comes as separate islands, so I group vertices by connectivity and pack a petal id and a pivot vertex into vertex color; a hash of that id staggers the timing and the lift, so they don't all leave together. I combine VAT with a procedural pass so I get both: the baked motion, and the freedom to invent on top.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -313,7 +317,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The anchors are <strong>hip</strong>, <strong>left hand</strong>, <strong>left boot</strong>, and <strong>backpack</strong>. Each one only raises the chance of plants nearby; they stay where the pose put them, neighbouring fields can merge, and each falloff is an ellipse along the limb. I warp the sample first so the shape is uneven, then add the anchors and clamp so overlaps become one mass. Points under the body or the pack I drop with the posed MeshBVH, which I use again later for the tendrils. After that I leave <strong>bare patches</strong> so it does not fill in like a carpet.</p>
+<p>The anchors are <strong>hip</strong>, <strong>left hand</strong>, <strong>left boot</strong>, and <strong>backpack</strong>. Each one only raises the chance of plants nearby; they stay where the pose put them, neighboring fields can merge, and each falloff is an ellipse along the limb. I warp the sample first so the shape is uneven, then add the anchors and clamp so overlaps become one mass. Points under the body or the pack I drop with the posed MeshBVH, which I use again later for the tendrils. After that I leave <strong>bare patches</strong> so it does not fill in like a carpet.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -321,7 +325,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The density field is the static layout, and this part is how flowers grow on it. I place <strong>hearts</strong> first — clump centres, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until it sticks. The hearts wander slowly on their own, and the density field stays put.</p>
+<p>The density field defines the static layout; the next step is deciding how flowers grow across it. I place <strong>hearts</strong> first — clump centers, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until it sticks. The hearts wander slowly on their own, and the density field stays put.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -340,8 +344,8 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <p>Stems are packed into one draw, the same instinct as instancing the grass in <em>False Earth</em>. Each plant keeps its static metadata on the CPU as a JavaScript object: its seed, flower type, anchor, heart, and opening range, written once when the field is laid out from the density at that spot. Each tube is built once. Every frame, I pack only the changing values — how far the stem has come, a little sway, and a world offset and yaw — into a DataTexture for the GPU to read, so a respawn can move without remeshing.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":120106,"width":"689px","height":"auto","aspectRatio":"2.259920968555574","sizeSlug":"full","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/Group-46-3.png" alt="" class="wp-image-120106" style="aspect-ratio:2.259920968555574;width:689px;height:auto"/></figure>
+<!-- wp:image {"id":120112,"width":"689px","height":"auto","aspectRatio":"2.259920968555574","sizeSlug":"full","linkDestination":"none","align":"center"} -->
+<figure class="wp-block-image aligncenter size-full is-resized"><img src="https://tympanus.net/codrops/wp-content/uploads/2026/08/Group-46-1-1.png" alt="" class="wp-image-120112" style="aspect-ratio:2.259920968555574;width:689px;height:auto"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:heading -->
@@ -349,7 +353,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I added tendrils to connect the garden to the astronaut: the field grows around him, and a second system grows across the suit. The paths need to feel grown, follow the print look, and be generated from the posed meshes.</p>
+<p>I added tendrils to connect the garden to the astronaut: the field grows around him, and a second system grows across the suit. The paths need to feel grown rather than drawn, belong to the same print language, and emerge from the posed meshes.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -379,7 +383,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
-<h5 class="wp-block-heading"><strong>Wrap construction</strong></h5>
+<h5 class="wp-block-heading"><strong>Wrap Construction</strong></h5>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":2} -->
@@ -397,7 +401,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
-<h5 class="wp-block-heading"><strong>Ground route</strong></h5>
+<h5 class="wp-block-heading"><strong>Ground Route</strong></h5>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":5} -->
@@ -419,7 +423,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Suit integration</strong></h4>
+<h4 class="wp-block-heading"><strong>Suit Integration</strong></h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -431,11 +435,11 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers, with the high- and low-poly meshes sharing the same per-head state. The new problem appeared on iPhone: the indirect path submitted both LOD meshes. Apple touch devices and the WebGL2 fallback therefore select the visible band on the CPU, clear the indirect buffer, and set <code>Mesh.count</code>.</p>
+<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers. The high- and low-poly meshes share one per-head data store, while each LOD keeps its own visible-index list. On Apple touch devices and the WebGL2 fallback, I select one distance band per flower on the CPU, compact the indices, disable indirect drawing, and set each mesh's <code>mesh.count</code>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The low-poly VAT mesh also serves as a shadow-only proxy on a separate render layer, so the shadow passes do not need the full petal geometry.</p>
+<p>The low-poly VAT geometry also serves as a shadow-only proxy on a separate render layer. It stays out of the view camera and is used by the shadow maps, so those passes do not need the full flower geometry.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -443,17 +447,13 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I started as an interactive developer for physical installations. Three.js still feels like the same leap: a link, a browser, no special hardware. <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em> was the step into WebGPU — storage buffers, compute, an endless field of grass.</p>
+<p>This chapter started with visual observation. I studied how <em>Akira</em> and traditional Japanese paintings use flat color, clear edges, tactile surfaces, and careful spacing to create atmosphere. I then translated those qualities into toon-shaded forms, ink-wash shadows, woven surfaces, procedural flowers, and tendrils that grow across the posed body.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><em>Still</em> is another step, not more of that grass. Each chapter in this series is a new expression. Here the astronaut finally stops. The picture language becomes Japanese print. A generative garden can sit next to a body that is no longer trying to reach the horizon, and a second system can grow on the suit itself.</p>
+<p>The process taught me how to turn observation into a working system. Instead of copying a reference, I had to identify what created its feeling and find a practical way to reproduce that quality in real-time 3D. The field rules, flower lifecycles, packed data, tendril routes, culling, level of detail, and lightweight shadow proxies all had to support a clear visual or narrative goal. The most difficult part was balancing visual richness with performance: I wanted the scene to feel dense, tactile, and alive, but every additional vertices, instances, shadow, and layer of detail had a cost.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>He is still. The plants are not.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
+<p>For future chapters, I want to keep that curiosity and attention to observation. A new story may lead me toward a different visual direction, while a visual experiment may reveal a story I had not considered before.</p>
 <!-- /wp:paragraph -->
