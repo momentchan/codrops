@@ -1,12 +1,3 @@
-<p><!--
-Codrops title / subtitle (paste into the post header, not as H1 in the body):
-
-Title: Still: From Akira to Ink Wash, Building a Generative Garden in WebGPU
-Subtitle: Chapter three of an interactive astronaut series: translating flat color, sharp outlines, woven surfaces, and organic growth into a real-time scene.
-
-Tags: case study, Three.js, TSL, WebGPU, procedural, toon
---></p>
-
 <!-- wp:paragraph -->
 <p><a href="https://still.mingjyunhung.com/">Live Demo</a></p>
 <!-- /wp:paragraph -->
@@ -27,12 +18,16 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <p>In that half-dreaming state, time loses its edges. The ground, the flowers, and the suit begin to merge into one continuous landscape, while his thoughts drift between memory and the present.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:video {"id":120160} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-intro.mp4"></video></figure>
+<!-- /wp:video -->
+
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Building a Japanese Print Style</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The visual exploration for this chapter started with <em>Akira</em>. I was drawn to its graphic discipline: flat color, sharp outlines, and frames that feel drawn rather than photographed. The stillness in those images mattered as much as the action.</p>
+<p>The visual exploration for this chapter started with <em>Akira</em>, but my connection to it was emotional before it was technical. Every part of the film stayed with me: the visual style, the atmosphere, the sound, and the music. Long after watching it, those impressions still haunted me in the best way. They left me with a deep desire to make something that could create a similarly lasting feeling.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -40,7 +35,7 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I translated those observations into a real-time 3D scene. Toon shading keeps the planes broad, the ground shadow becomes an uneven ink wash, the silk weave supplies material grain, and procedural growth gives the flowers and tendrils an organic rhythm. The goal was not to reproduce any reference literally, but to understand what made the images feel composed, tactile, and alive.</p>
+<p>I translated those observations into a real-time 3D scene. Toon shading keeps the planes broad, the ground shadow becomes an uneven ink wash, the silk weave supplies material grain, and procedural growth gives the flowers and tendrils an organic rhythm.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -154,7 +149,7 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p>I was looking at two Japanese folding screens of hollyhocks: Sakai Hōitsu's (1801) and Ogata Kenzan's. The ground is the part I keep noticing — a faint weave, a grid like threads, and marks that sit like stains, uneven enough that it feels painted by hand. That is the feeling I am chasing.</p>
+<p>I was looking at two Japanese folding screens of hollyhocks: Sakai Hōitsu's (1801) and Ogata Kenzan's. The ground is the part I keep noticing — a faint weave, a grid like threads, and marks that sit like stains, uneven enough that it feels painted by hand, and that unevenness is what I wanted in the frame.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -264,7 +259,7 @@ grown = center.add(positionLocal.sub(center).mul(rScale));
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Then I sit a few of them on the stem. Each <code>t</code> is a seeded sample along the middle of the curve, sorted so they climb in order; they alternate around the shaft and sit on the tube’s surface at that <code>t</code>. Placement is baked — unlike the flower head, they do not ride the growing end. The same 0 to 1 that grows the stem reveals the leaf after the front passes that <code>t</code>.</p>
+<p>Then I attach a few of them to the stem. Each <code>t</code> is a seeded sample along the middle of the curve, sorted so they climb in order, and they alternate around the shaft at the tube’s surface for that <code>t</code>. Each position is computed once and does not change after that, so unlike the flower head they do not ride the growing end. The same 0 to 1 that grows the stem reveals the leaf after the front passes that <code>t</code>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -309,7 +304,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p>The field is a probability map first, placement second. Anchors raise the chance of plants around the body, and a warped field turns that into irregular masses. Hearts sit in those masses and wander slowly, while the density field stays put. Flowers <strong>hop</strong> off a heart, and when a plant dies the flower hops again the same way.</p>
+<p>The field is a probability map first, placement second. Anchors raise the chance of plants around the body, and a warped field turns that into irregular masses. Hearts are placed inside those masses and wander slowly, while the density field itself does not change. Flowers <strong>hop</strong> off a heart, and when a plant dies the flower hops again the same way.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -325,7 +320,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The density field defines the static layout; the next step is deciding how flowers grow across it. I place <strong>hearts</strong> first — clump centers, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until it sticks. The hearts wander slowly on their own, and the density field stays put.</p>
+<p>The density field is the static layout, and this part is how flowers grow on it. I place <strong>hearts</strong> first — clump centers, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until one is accepted. The hearts wander slowly on their own, while the density field they are sampled against does not change.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -357,7 +352,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>This section follows how one of those tendrils is made from geometry rather than hand-authored as a curve: I choose a place for it to touch the suit, build its local wrap, route that contact across the mesh to the ground, and then hand the resulting tree to the growth system. First I will describe how the branches are represented; then I will walk through the surface-routing pipeline that creates them.</p>
+<p>None of these curves are hand-authored; each one comes out of the geometry, by choosing a place for it to touch the suit, building its local wrap, routing that contact across the mesh down to the ground, and handing the resulting tree to the growth system. Below is how a branch is represented, and then the surface routing that creates one.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -388,11 +383,11 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 
 <!-- wp:list {"ordered":true,"start":2} -->
 <ol start="2" class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Choose a wrap station</strong><p>I sample the posed surface, assign each accepted point to an eligible guide, and store its normalized position <code>u</code> along that guide. Together, these values determine where the wrap begins.</p></li>
+<li><strong>Choose a wrap station</strong><p>I sample the posed surface, assign each accepted point to an eligible guide, and store its normalized position <code>u</code> along that guide, which is where the wrap begins.</p></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions. These are the positions where the host surface will be tested.</p></li>
+<li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions, which are the points where I test the host surface.</p></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
@@ -406,7 +401,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 
 <!-- wp:list {"ordered":true,"start":5} -->
 <ol start="5" class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>. This gives the ground route a discrete endpoint.</p></li>
+<li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>, which gives the ground route a discrete endpoint to walk to.</p></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
@@ -447,11 +442,11 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This chapter started with visual observation. I studied how <em>Akira</em> and traditional Japanese paintings use flat color, clear edges, tactile surfaces, and careful spacing to create atmosphere. I then translated those qualities into toon-shaded forms, ink-wash shadows, woven surfaces, procedural flowers, and tendrils that grow across the posed body.</p>
+<p>This chapter started with looking rather than coding: how <em>Akira</em> and the folding screens get their atmosphere out of flat color, clear edges, tactile surfaces, and careful spacing. Those qualities became toon-shaded forms, ink-wash shadows, woven surfaces, procedural flowers, and tendrils that grow across the posed body.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The process taught me how to turn observation into a working system. Instead of copying a reference, I had to identify what created its feeling and find a practical way to reproduce that quality in real-time 3D. The field rules, flower lifecycles, packed data, tendril routes, culling, level of detail, and lightweight shadow proxies all had to support a clear visual or narrative goal. The most difficult part was balancing visual richness with performance: I wanted the scene to feel dense, tactile, and alive, but every additional vertices, instances, shadow, and layer of detail had a cost.</p>
+<p>Copying a reference was never the point, so each time I had to work out what actually created the feeling and find a way to get that in real-time 3D. The field rules, flower lifecycles, packed data, tendril routes, culling, level of detail, and lightweight shadow proxies all had to earn their place visually or narratively. The hardest part was the trade against performance: I wanted the scene to feel dense, tactile, and alive, and every extra vertex, instance, shadow, and layer of detail had a cost.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
