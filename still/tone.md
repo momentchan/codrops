@@ -37,6 +37,14 @@ Do not stack declarations. `That field is only a static layout; it does not move
 - **Bold** for named techniques
 - Short code for your non-obvious bits only
 
+## Emphasis
+
+- Use `<em>` for titles of works, films, articles, projects, or other referenced pieces: `Still`, `Akira`, `False Earth`, and `Flowers and People`.
+- Do not use `<em>` for people's names, organisations, libraries, or ordinary technical terms.
+- Use `<strong>` for named techniques, workflow stages, and recurring system concepts that help the reader scan the process: `MeshBVH`, `surface graph`, `hearts`, or `bare patches`.
+- Do not bold ordinary verbs, adjectives, or nouns just because they are important in a sentence. Use `<code>` for actual code names, parameters, and values.
+- Headings already provide emphasis, so do not wrap their text in `<strong>`.
+
 ## Reference article
 
 [False Earth on Codrops](https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/) — sequel framing, first-person process, algorithm-first sections.

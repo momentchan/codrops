@@ -1,12 +1,3 @@
-<p><!--
-Codrops title / subtitle (paste into the post header, not as H1 in the body):
-
-Title: Still: From Akira to Ink Wash, Building a Generative Garden in WebGPU
-Subtitle: Chapter three of an interactive astronaut series: translating flat color, sharp outlines, woven surfaces, and organic growth into a real-time scene.
-
-Tags: case study, Three.js, TSL, WebGPU, procedural, toon
---></p>
-
 <!-- wp:paragraph -->
 <p><a href="https://still.mingjyunhung.com/">Live Demo</a></p>
 <!-- /wp:paragraph -->
@@ -20,27 +11,27 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First he was lost in <em><a href="https://drift.mingjyunhung.com/">Drift</a></em>. Then he was running across <em><a href="https://false-earth.mingjyunhung.com/">False Earth</a></em>, day after day, always moving, never arriving. After moving for what felt like forever, exhaustion finally catches up with him. He lies down, suspended between waking and sleep.</p>
+<p>After being lost in <em><a href="https://drift.mingjyunhung.com/">Drift</a></em>, he ran across <em><a href="https://false-earth.mingjyunhung.com/">False Earth</a></em> day after day, always moving, never arriving. Eventually, after what felt like forever, exhaustion caught up with him, and he lay down, suspended between waking and sleep. In that half-dreaming state, time loses its edges. The ground, the flowers, and the suit begin to merge into one continuous landscape, while his thoughts drift between memory and the present.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>In that half-dreaming state, time loses its edges. The ground, the flowers, and the suit begin to merge into one continuous landscape, while his thoughts drift between memory and the present.</p>
-<!-- /wp:paragraph -->
+<!-- wp:video {"id":120249} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-intro-1080p.mp4"></video></figure>
+<!-- /wp:video -->
 
 <!-- wp:heading -->
 <h2 class="wp-block-heading">Building a Japanese Print Style</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The visual exploration for this chapter started with <em>Akira</em>. I was drawn to its graphic discipline: flat color, sharp outlines, and frames that feel drawn rather than photographed. The stillness in those images mattered as much as the action.</p>
+<p>The visual exploration for this chapter started with <em>Akira</em>. My connection to the film was emotional before it became technical: its visual style, atmosphere, sound design, and music stayed with me long after I watched it, leaving me wanting to create something with a similarly lasting feeling.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I then looked toward traditional Japanese paintings and folding screens. Their floral forms, clear edges, woven grounds, and irregular ink-like marks create depth and atmosphere through shape, surface, and spacing rather than realism. I wanted to understand what gave these images their quiet, tactile quality.</p>
+<p>I then looked toward traditional Japanese paintings and folding screens. Placing <em>Akira</em> beside these paintings, I noticed a shared visual logic: flat areas of color, clear edges, deliberate composition, woven surfaces, and irregular marks that create atmosphere through shape, surface, and spacing rather than realism. In both, stillness and rhythm matter as much as detail.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I translated those observations into a real-time 3D scene. Toon shading keeps the planes broad, the ground shadow becomes an uneven ink wash, the silk weave supplies material grain, and procedural growth gives the flowers and tendrils an organic rhythm. The goal was not to reproduce any reference literally, but to understand what made the images feel composed, tactile, and alive.</p>
+<p>I translated this shared logic into a real-time 3D scene. <strong>Toon shading</strong> keeps the planes broad, the <strong>ground shadow</strong> becomes an uneven ink wash, the <strong>silk weave</strong> supplies material grain, and <strong>procedural growth</strong> gives the flowers and tendrils an organic rhythm. The goal was not to reproduce either reference literally, but to carry their sense of composition and material presence into a living scene.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -54,15 +45,15 @@ Tags: case study, Three.js, TSL, WebGPU, procedural, toon
 <!-- /wp:gallery -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Woodblock Toon</strong></h4>
+<h4 class="wp-block-heading">Woodblock Toon</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The astronaut and the flowers share the same banded light, but they run through different shaders: the suit uses a toon material on textured albedo, while petals and stems use a vertex-color material built for VAT instancing. The quantized step below is what ties them together.</p>
+<p>I wanted the astronaut and flowers to share the same visual style, but each needed its own shading and outline methods. For shading, the suit uses a toon material on textured albedo, while petals and stems use a vertex-color material built for VAT instancing. Applying the same quantized lighting to both is what makes them read as one image. For the outlines, the character uses an inverted hull, while the petals use a mask-based shader.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The lighting starts with N·L, how much the surface faces the light, where N is the normal and L is the light direction. I remap that value between <code>thresholdLow</code> and <code>thresholdHigh</code>, then <code>floor</code> it into <strong>color levels</strong>; on the character and flowers I keep that at 2, one shadow band and one lit band, since anything more stops reading like print. Shadow and highlight are tints on the base color, and when the bands still look too clean I wobble the threshold with a little world-space noise before the clamp — just enough to break the hard edge.</p>
+<p>I start with N·L, which measures how much a surface faces the light: N is the normal and L is the light direction. I remap it between <code>thresholdLow</code> and <code>thresholdHigh</code>, then use <code>floor</code> to quantize it into color levels. I keep the result to two levels: one shadow band and one lit band, because more steps stop reading like print. Shadow and highlight are tints on the base color, and when the bands look too clean I add a little world-space noise to the threshold to break the hard edge.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -87,19 +78,19 @@ const litColor = mix(
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>The ink edge is where the pipelines split. On the character, it comes from an inverted hull: a second mesh, back-face, pushed out along the normal. Petals skip that approach because every VAT head is instanced hundreds of times, and wrapping each in a second mesh would blow the budget while still tracing the wrong silhouette, since the deforming mesh is not the petal cutout. The shape already lives in a mask texture, so I discard outside it and draw the rim in the shader with <code>fwidth</code> on that same mask — one texture for both shape and edge. Stems get a view-facing rim in the shader as well, with no extra geometry.</p>
+<p>The outline follows the same style, but the implementation depends on each asset's geometry. On the character, I use an inverted hull: a second mesh with back faces pushed out along the normal. Petals skip that path because each VAT head is instanced hundreds of times, so adding another mesh for every head would be expensive and would still trace the wrong silhouette: the deforming mesh is not the petal cutout. The shape is already in a mask texture, so I discard the outside and draw the rim in the shader on that same mask, which lets one texture handle both shape and edge.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:video {"id":120027} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-toon-1.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120250} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-toon-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Ink-Wash Ground Shadow</strong></h4>
+<h4 class="wp-block-heading">Ink-Wash Ground Shadow</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>While I was looking at <em>Akira</em> for the look of this chapter, I found this poster. Kaneda and the bike on flat white — and the shadow underneath is the part I keep noticing: a wash, soft at the edge, uneven inside, barely following the silhouette, like paint thinned on paper. Everything else in this scene is built to look drawn, so the shadow could not be the one thing that still looks rendered.</p>
+<p>While I was looking at <em>Akira</em> for this chapter, I found this poster. Kaneda and the bike sit on flat white, but the shadow underneath is the part I keep noticing: soft at the edge, uneven inside, and only loosely following the silhouette, like paint thinned on paper. Since the rest of the scene is built to look drawn, I wanted the shadow to follow the same logic.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":119968,"width":"380px","height":"auto","sizeSlug":"large","linkDestination":"none"} -->
@@ -107,11 +98,11 @@ const litColor = mix(
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>The directional light already writes a shadow map. TSL's <code>shadow(light)</code> reads it on the ground; I invert that to <code>shade</code>, high under him, fading out at the edges. I flatten it with <code>smoothstep</code> so it reads as that wash: the inside holds a level, and the leftover band is the soft edge. One <code>noise</code> field does the rest: <code>washBleed</code> added before <code>smoothstep</code> so the blob barely follows the silhouette, <code>washMottle</code> multiplied in after so the inside is uneven, like paint thinned on paper. Same noise, so the edge and the fill stay consistent.</p>
+<p>The directional light already gives me a shadow map. I read it on the ground, invert it, and run it through <code>smoothstep</code> to turn it into a broad wash with a soft edge. One noise field loosens the edge and breaks up the fill, so the edge and fill vary together.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The darker <strong>contour</strong> is a drawn stroke from the same <code>shade</code>, wherever it is close to <code>contourShade</code>, sitting outside the wash instead of tracing it. A finer, separate noise lets the line break, so it does not run as one continuous edge. <code>fwidth</code> keeps whatever is left a steady width on screen. Wash and line combine with <code>max</code>, so the stronger of the two wins each pixel and neither darkens the other.</p>
+<p>The darker <strong>contour</strong> uses the same shadow value and sits just outside the wash rather than tracing the silhouette, so it stays tied to the shadow while reading as a separate drawn stroke. A finer noise breaks the line so it does not run as one continuous edge, while <code>fwidth</code> keeps its screen-space width steady. I combine the wash and line with <code>max</code>, so overlapping masks do not stack and make the result too dark.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -127,20 +118,20 @@ const shColor = mix(washColor, contourColor, line);
 return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video {"id":120062} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-shadow-1.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120251} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-shadow-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:paragraph -->
-<p>I wanted the flowers to cast shadows on the character, but not on themselves. I use two shadow maps: one has the character and the flowers, for the ground wash; the other contains only the flowers, sampled by the character. That map comes from a directional light at the same place with no intensity: it only writes depth, and its shadow camera sees the flowers and not the character, so the character can sample it without being in it.</p>
+<p>Beyond the ground wash, I also wanted the flowers to cast shadows on the character without casting them onto themselves. For that, I use a second shadow map containing only the flowers: their casters use a separate layer, and the plant-shadow light's shadow camera is restricted to it. The light shares the main light's position but has zero intensity, so it writes depth without adding visible light and keeps the character out of the map.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:video {"id":120075} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-shadow-on-character.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120252} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-shadow-on-character-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Silk Weave</strong></h4>
+<h4 class="wp-block-heading">Silk Weave</h4>
 <!-- /wp:heading -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -154,11 +145,11 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p>I was looking at two Japanese folding screens of hollyhocks: Sakai Hōitsu's (1801) and Ogata Kenzan's. The ground is the part I keep noticing — a faint weave, a grid like threads, and marks that sit like stains, uneven enough that it feels painted by hand. That is the feeling I am chasing.</p>
+<p>I was looking at two Japanese folding screens of hollyhocks: Sakai Hōitsu's and Ogata Kenzan's. The ground is the part I keep noticing: a faint weave, a grid like threads, and marks that sit like stains, uneven enough to feel painted by hand. I wanted to carry that quality into the scene.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I put that weave over the whole frame because on those screens the grid and the stains sit in the ground of the painting, not on a single object. <code>screenUV</code> is scaled into thread cells with <code>threadCount</code>, then hash-jittered by <code>irregularity</code> so the grid does not look machine-made. <code>warp</code> and <code>weft</code> are the thread cross-section, high on the fiber and low in the groove; a checker mixes which one sits on top. <code>threadVariation</code> shifts each fiber's tone. <code>blotch</code> is slower noise, multiplied in as stains. Fabric and stain multiply, so they darken the whole frame together.</p>
+<p>I put that weave over the whole frame because, on those screens, the grid and stains belong to the ground of the painting rather than to one object. I scale <code>screenUV</code> into thread cells, jitter the grid so it does not look machine-made, and combine the warp and weft directions into a weave. I shift the thread tones and multiply in slower noise for stains, then multiply both layers with the scene color so the texture darkens the frame as a whole.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -174,8 +165,8 @@ const blotch = float(1.0).sub(blotchStrength.mul(smoothstep(0.45, 0.95, stain)))
 const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video {"id":120091} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-silk-2.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120253} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-silk-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading -->
@@ -183,15 +174,15 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The garden later grows from many copies of this plant. I start with one so you can see what it contains — a flower, a stem, leaves, and a life cycle — before they gather around him.</p>
+<p>With the frame established, I turn to the smallest repeated unit in the garden: one plant. Before building the field around him, I use a single plant to work out its flower, stem, leaves, and lifecycle.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Flower</strong></h4>
+<h4 class="wp-block-heading">Flower</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>For the flower animation I used the <a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a> Blender pack. Its carefully designed Geometry Nodes produce motion that feels vivid and graceful, which is why I kept it as the base animation. I turn that motion into VAT, the same technique I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made that handles the whole workflow directly in Blender.</p>
+<p>For the flower animation I use the <em><a href="https://superhivemarket.com/products/blooming-flowers---geo-nodes-curve-asset-pack">Blooming Flowers</a></em> Blender pack. Its Geometry Nodes already produce the detailed bloom motion I need, so I keep that animation and convert it to VAT with the same workflow I used in <em><a href="https://tympanus.net/codrops/2026/04/21/false-earth-from-webgl-limits-to-a-webgpu-driven-world/">False Earth</a></em>, using an <a href="https://github.com/momentchan/BlenderAlembicToVAT">addon</a> I made for the whole process in Blender.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":119999,"sizeSlug":"large","linkDestination":"none"} -->
@@ -199,28 +190,37 @@ const overlaid = sceneColor.mul(tint).mul(fabric).mul(blotch);</code></pre>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>On top of that baked VAT, petals leave a few at a time — each shrinking toward its own center, then lifting and fanning out. The shedding is inspired by <a href="https://www.teamlab.art/w/flowersandpeople-hour/"><em>Flowers and People</em></a> by teamLab: a flower at its fullest just before it falls. The mesh already comes as separate islands, so I group vertices by connectivity and pack a petal id and a pivot vertex into vertex color; a hash of that id staggers the timing and the lift, so they don't all leave together. I combine VAT with a procedural pass so I get both: the baked motion, and the freedom to invent on top.</p>
+<p>On top of that baked VAT, petals leave a few at a time, then lift and fan out. I took the shedding idea from <a href="https://www.teamlab.art/w/flowersandpeople-hour/"><em>Flowers and People</em></a> by teamLab, where a flower reaches its fullest point just before it falls. The mesh already comes as separate islands, so I group vertices by connectivity and pack a petal id and a pivot vertex into vertex color. A hash of that id staggers the timing and varies each petal's lift, while the eased value drives both the upward motion and the outward spread. Combining baked VAT with a procedural pass lets me preserve detailed authored motion while adding variation and controllable behavior at runtime, making the animation feel more alive and less repetitive without rebaking the original.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
 <pre class="wp-block-code"><code>const petalId = color.g; // island id, 0..1
 const pivot = sampleVAT(color.b, frame); // same vertex, current bloom frame
 const startJitter = fract(sin(petalId * 127.1) * 43758.5453);
+const heightJitter = fract(sin(petalId * 127.1 + 7.13) * 43758.5453);
 const t = clamp((shed - startJitter * stagger) / (1.0 - stagger), 0.0, 1.0);
 const ease = t * t * (3.0 - 2.0 * t);
-const shrunk = pivot.add(basePos.sub(pivot).mul(1.0 - ease));</code></pre>
+const shrunk = pivot.add(basePos.sub(pivot).mul(1.0 - ease));
+const height = 1.0 + (heightJitter - 0.5) * 2.0 * riseVariance;
+const lift = rise * max(height, 0.0) * ease;
+const outward = normalize(vec3(pivot.x, 0.0, pivot.z));
+const fan = rotate(outward, flowerRotation) * spread * ease;
+
+const position = rotate(shrunk, flowerRotation) + flowerPosition
+  + vec3(0.0, lift, 0.0) * stemLength
+  + fan * stemLength;</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video {"id":120086} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-flower-2.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120255} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-flower-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Stem</strong></h4>
+<h4 class="wp-block-heading">Stem</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>That pack also builds the stem in Geometry Nodes, but those stems are already designed for specific flowers. I kept the idea — a curve, a tube — and did it procedurally in Three.js instead of baking the stem into VAT, so I could vary the shape. A seeded Catmull-Rom runs from the ground to a tip that leans and bends; I sweep a tube along it, then scale each ring so the base flares and the shaft tapers.</p>
+<p>That pack also builds stems in Geometry Nodes, but those stems are tied to specific flowers. I wanted a stem I could reshape in Three.js, so I rebuilt the same basic idea: a curve swept into a tube. A seeded Catmull-Rom curve starts slightly below the ground, leans toward the flower head, and gets a sideways bend. I sample that curve into rings, flare the base, and taper the shaft toward the tip.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -241,7 +241,7 @@ const scale = (1 - (1 - radiusAttenuation) * t) + baseFlare * (1 - t) ** 3;</cod
 <!-- /wp:code -->
 
 <!-- wp:paragraph -->
-<p>I build the tube from that curve once. A value from 0 to 1 then drives two GPU steps: the fragment discards rings past the front along <code>uv.x</code>, and the vertex shader thickens the shaft from the centerline — wait, push out, stand, pull back. The flower head is placed on the CPU from that same value, so the bloom stays on the growing end.</p>
+<p>After building the tube once, I grow it with one value from 0 to 1. The fragment shader hides everything beyond the growth front, while the vertex shader scales each visible ring out from the centerline and moves the front continuously through its active segment. I use the same value to place the flower head along the curve, so the bloom stays attached to the end of the stem as it grows.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -251,20 +251,20 @@ grown = center.add(positionLocal.sub(center).mul(rScale));
 </code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video {"id":120087} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-stem.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120256} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-stem-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Leaf</strong></h4>
+<h4 class="wp-block-heading">Leaf</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The leaf starts as a modeled mesh. I bend its vertices in the shader: a curl along the blade, tight at first, then easing open as it grows.</p>
+<p>With the stem in place, I add leaves as a separate modeled mesh. In the shader I bend each blade, starting with a tight curl and easing it open as the leaf grows.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Then I sit a few of them on the stem. Each <code>t</code> is a seeded sample along the middle of the curve, sorted so they climb in order; they alternate around the shaft and sit on the tube’s surface at that <code>t</code>. Placement is baked — unlike the flower head, they do not ride the growing end. The same 0 to 1 that grows the stem reveals the leaf after the front passes that <code>t</code>.</p>
+<p>I place a few leaves at seeded positions along the middle section of the curve, sort them from base to tip, and alternate them around the shaft. Each leaf attaches to the tube’s surface at its own <code>t</code>, so its position stays stable while the stem grows. The same 0 to 1 growth value then reveals each leaf after the front reaches its attachment point.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
@@ -274,16 +274,16 @@ const growFrac = smoothstep(attachT, attachT + GROW_WINDOW, stemGrow);
 placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:code -->
 
-<!-- wp:video {"id":120088} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-leaf.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120257} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-leaf-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Lifecycle</strong></h4>
+<h4 class="wp-block-heading">Lifecycle</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The clock is the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong> — and Die itself is shed, then retract. One age drives the plant. In Delay the stem rests; flower and leaf are not in yet. Grow is the stem’s 0–1: the flower rides that tip as the VAT opens, while each leaf waits on the shaft, then uncurls after the front has passed. Keep holds — stem stands, flower full, leaves open. Then <strong>petal shed</strong> runs while the stem still stands and the leaves stay; after that the stem goes 1→0, and the leaves go with it.</p>
+<p>The animation has two levels of time. At the plant level, each instance owns a complete lifecycle with its own seeded age and durations, so plants can be in different phases while using the same rules. Within that timeline, the stem, flower, and leaves each receive their own component progress. These are not separate clocks: the plant lifecycle decides when each part acts, and its local progress decides how that part appears. The plant clock uses the same four stages as <em>False Earth</em>: <strong>Delay, Grow, Keep, Die</strong>. During Delay, the plant is at rest. During Grow, the stem advances from 0 to 1, the flower follows its tip as the VAT opens, and each leaf starts unfolding when the growth front reaches its attachment point. During Keep, the stem and flower stay full and the leaves remain open. During Die, <strong>petal shed</strong> begins while the stem is still standing, then the stem returns from 1 to 0 and the leaves retract with it.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":120005,"sizeSlug":"large","linkDestination":"none"} -->
@@ -295,7 +295,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Scattering copies at random around the astronaut reads as noise. I wanted a layout that feels grown: masses that thicken and thin, with bare ground between them, like a thicket that grew there. Drawings like these are what I built toward — dense hubs, a soft fall-off.</p>
+<p>Once one plant works, I can distribute it around the astronaut. Random copies read as noise, so I build the field as uneven masses with gaps of ground between them. The two references below build density through clustered marks and open gaps rather than filling the surface evenly. That is the balance I wanted for the field: dense hubs, soft fall-off, and no uniform carpet.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->
@@ -309,39 +309,39 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p>The field is a probability map first, placement second. Anchors raise the chance of plants around the body, and a warped field turns that into irregular masses. Hearts sit in those masses and wander slowly, while the density field stays put. Flowers <strong>hop</strong> off a heart, and when a plant dies the flower hops again the same way.</p>
+<p>I build the field as a probability map before placing any plants. Four anchors around the astronaut raise the local probability, and a warp breaks the resulting shapes into irregular masses. Hearts mark centers within those masses and move slowly, while the density field stays fixed. Flowers hop from a heart and repeat that step when a plant dies.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>The Density Field</strong></h4>
+<h4 class="wp-block-heading">The Density Field</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The anchors are <strong>hip</strong>, <strong>left hand</strong>, <strong>left boot</strong>, and <strong>backpack</strong>. Each one only raises the chance of plants nearby; they stay where the pose put them, neighboring fields can merge, and each falloff is an ellipse along the limb. I warp the sample first so the shape is uneven, then add the anchors and clamp so overlaps become one mass. Points under the body or the pack I drop with the posed MeshBVH, which I use again later for the tendrils. After that I leave <strong>bare patches</strong> so it does not fill in like a carpet.</p>
+<p>I define four body-contact regions as anchors: the hip, left hand, left boot, and backpack. Each adds density nearby with an elliptical falloff along its local axis. Those falloffs would be too regular on their own, so I distort the map by warping each sample coordinate before evaluating it. I combine the anchor contributions so overlapping regions merge into one mass, then use the posed body and pack BVHs to reject samples that fall inside or too close to the model. The tendril system uses the same BVHs later for its surface queries, so I build the host geometry once and reuse it. Finally, I leave <strong>bare patches</strong> so the result does not become a carpet.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Hearts and Hops</strong></h4>
+<h4 class="wp-block-heading">Hearts and Hops</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The density field defines the static layout; the next step is deciding how flowers grow across it. I place <strong>hearts</strong> first — clump centers, about one for every seven plants. I split the count across the anchors by weight, then sample each heart against that density field until it sticks. The hearts wander slowly on their own, and the density field stays put.</p>
+<p>Density tells me where plants can grow, but I still need a way to group them. I place <strong>hearts</strong> as local clump centers, roughly one for every seven plants. I distribute them across the anchors by weight and keep each one only if it lands inside the density field. The hearts then wander slowly, while the underlying density map remains fixed.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>A flower <strong>hops</strong> by taking a short random step off a heart, then I keep that point only if the density field accepts it, the same check as the heart. When a plant dies the flower hops again the same way, so the clumps stay around the hearts as those hearts wander. Once a flower has a spot, head size and how far it can open follow local density. Rose is the quieter shape, so it is common and can fill the mass, while dahlia is brighter and busier, so I keep that one rare.</p>
+<p>Each flower starts with a short random step from a heart. I keep the new point only if it passes the same density check, so it stays inside the surrounding mass. When a plant dies, I repeat the step around a nearby heart, so the next plant remains in the same local mass as the hearts move. Local density then controls head size and opening range. To keep the clusters from becoming visually noisy, I let the quieter rose fill most of the field and reserve the brighter, busier dahlia for fewer plants.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:video {"id":120094} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-field-1.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120262} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-field-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Packed Stems</strong></h4>
+<h4 class="wp-block-heading">Packed Stems</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Stems are packed into one draw, the same instinct as instancing the grass in <em>False Earth</em>. Each plant keeps its static metadata on the CPU as a JavaScript object: its seed, flower type, anchor, heart, and opening range, written once when the field is laid out from the density at that spot. Each tube is built once. Every frame, I pack only the changing values — how far the stem has come, a little sway, and a world offset and yaw — into a DataTexture for the GPU to read, so a respawn can move without remeshing.</p>
+<p>With the layout fixed, I merge the repeated stem tubes into one geometry and render them in one draw, following the instanced grass approach from <em>False Earth</em>. The CPU keeps each plant’s static layout and shape data, written once when the field is built. The GPU receives only the values that change, such as growth, sway, world offset, and rotation angle, through a DataTexture updated each frame. A respawn can then change a plant’s position without rebuilding the geometry.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"id":120112,"width":"689px","height":"auto","aspectRatio":"2.259920968555574","sizeSlug":"full","linkDestination":"none","align":"center"} -->
@@ -353,27 +353,23 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I added tendrils to connect the garden to the astronaut: the field grows around him, and a second system grows across the suit. The paths need to feel grown rather than drawn, belong to the same print language, and emerge from the posed meshes.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>This section follows how one of those tendrils is made from geometry rather than hand-authored as a curve: I choose a place for it to touch the suit, build its local wrap, route that contact across the mesh to the ground, and then hand the resulting tree to the growth system. First I will describe how the branches are represented; then I will walk through the surface-routing pipeline that creates them.</p>
+<p>I added tendrils to connect the garden to the astronaut, both visually and conceptually. They turn the plants from an independent field into a living system that reaches back to him: the field grows around him, while tendrils cross the suit and lead back to the ground. Each tendril is a wrap across the suit joined to a ground route, then combined into one tree.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Tendril Trees</strong></h4>
+<h4 class="wp-block-heading">Tendril Trees</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>A field stem is one curve from ground to tip. A tendril tree joins packed tube segments under one <strong>tree</strong> and one growth clock, so a ground path can fork into several wraps while the whole structure grows as one path. I use the root-to-tip reveal idea from <a href="https://github.com/mattatz/THREE.Tree">mattatz/THREE.Tree</a>, while the branching here comes from surface routes and wrap targets. Routes taper toward the tips as their downstream load gets smaller. The wrap curves use one shared world-space spatial noise field, so nearby paths wobble together. Each wrap is a partial arc around its local guide for radial guides, while broad planar guides use a surface stroke, and both are offset slightly from the suit.</p>
+<p>Field stems are single tubes that run from ground to tip, while tendrils form branching tube structures. One ground entry can split into several branches that wrap around the suit. I pack these segments into one tree, so the whole structure can reveal as one continuous path. I use the root-to-tip reveal idea from <a href="https://github.com/mattatz/THREE.Tree">THREE.Tree</a>, but the branching comes from the surface routes and wrap targets. Routes taper toward the tips according to their downstream load, and a shared world-space noise field gives nearby wraps a related wobble. The wrap shape depends on its guide: radial guides form partial arcs around a capsule, while planar guides form surface strokes. I keep both shapes slightly away from the suit surface to avoid mesh intersections.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>How They Grow</strong></h4>
+<h4 class="wp-block-heading">How They Grow</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The routing is easier to understand as two linked jobs. The <strong>MeshBVH</strong> handles geometric queries: it finds the suit surface for the wrap and checks each candidate. The <strong>surface graph</strong> handles connectivity: it provides the walk from the ground to the wrap's hitch. Together, the ground route and wrap curve form one tendril. The hitch is their handoff point: the ground route reaches it, and the wrap curve continues from it across the host surface. The steps below keep those jobs separate.</p>
+<p>Each tendril combines two parts: a <strong>wrap curve</strong> across the suit and a <strong>ground route</strong> back to the floor. The wrap follows the host’s surface, while the ground route follows its connectivity. I use the <strong>MeshBVH</strong> for the wrap’s geometric queries and the <strong>surface graph</strong> for the route back to the ground. The hitch marks their handoff: the wrap begins there, and the ground route connects it back to the floor through the graph. The workflow follows that order: prepare the hosts, construct the wrap, then connect the hitch to the ground.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
@@ -383,7 +379,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
-<h5 class="wp-block-heading"><strong>Wrap Construction</strong></h5>
+<h5 class="wp-block-heading">Wrap Construction</h5>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":2} -->
@@ -392,7 +388,7 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary candidate positions. These are the positions where the host surface will be tested.</p></li>
+<li><strong>Generate wrap candidates</strong><p>The guide turns that station into temporary positions for testing the host surface.</p></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
@@ -401,33 +397,33 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:list -->
 
 <!-- wp:heading {"level":5} -->
-<h5 class="wp-block-heading"><strong>Ground Route</strong></h5>
+<h5 class="wp-block-heading">Ground Route</h5>
 <!-- /wp:heading -->
 
 <!-- wp:list {"ordered":true,"start":5} -->
 <ol start="5" class="wp-block-list"><!-- wp:list-item -->
-<li><strong>Choose the graph hitch</strong><p>The surface hitch may lie inside a triangle rather than on a graph vertex, so I select a nearby graph node as the <strong>graph hitch</strong>. This gives the ground route a discrete endpoint.</p></li>
+<li><strong>Choose the graph node</strong><p>The <strong>hitch</strong> does not always lie on a graph vertex, so I connect it to a nearby graph node before tracing the ground route.</p></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><strong>Route from the ground</strong><p>I use ground-near vertices as Dijkstra sources and trace the shortest path to the graph hitch. That path becomes the <strong>ground route</strong>.</p></li>
+<li><strong>Route from the ground</strong><p>I use the vertices near the ground as possible sources. Dijkstra selects the source connected to that graph node by the shortest path through the surface graph. The result is the <strong>ground route</strong>.</p></li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>Finally, the wrap curve meets the ground route at the graph hitch. Both parts share one tendril tree and one growth distance, so a single growth front reveals the tendril from the ground, through the hitch, and around the wrap.</p>
+<p>Finally, the local connection joins the graph node to the hitch. Both parts belong to one tendril tree, so a single growth front reveals the tendril from the ground, through the handoff, and around the wrap.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:video {"id":120095} -->
-<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/08/demo-tendril.mp4" playsinline></video></figure>
+<!-- wp:video {"id":120261} -->
+<figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-tendril-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><strong>Suit Integration</strong></h4>
+<h4 class="wp-block-heading">Suit Integration</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The body and backpack use the same host and routing pipeline. The backpack contributes a lighter contact layer, while the body carries most of the routes. Plumera heads bind to active wraps, giving the suit a different flower from the field.</p>
+<p>The body and backpack use the same host and routing pipeline. The body carries most of the routes, while the backpack adds a lighter contact layer. Plumera heads bind to active wraps, giving the suit its own flower type within the field.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -435,11 +431,11 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers. The high- and low-poly meshes share one per-head data store, while each LOD keeps its own visible-index list. On Apple touch devices and the WebGL2 fallback, I select one distance band per flower on the CPU, compact the indices, disable indirect drawing, and set each mesh's <code>mesh.count</code>.</p>
+<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers, with the high- and low-poly meshes sharing the same per-head state. On iPhone, the indirect path still submitted both LOD meshes. For Apple touch devices and the WebGL2 fallback, I select the visible band on the CPU, clear the indirect buffer, and set <code>Mesh.count</code>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The low-poly VAT geometry also serves as a shadow-only proxy on a separate render layer. It stays out of the view camera and is used by the shadow maps, so those passes do not need the full flower geometry.</p>
+<p>The low-poly VAT mesh also serves as a shadow-only proxy on a separate render layer, so the shadow passes do not need the full petal geometry.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -447,13 +443,13 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This chapter started with visual observation. I studied how <em>Akira</em> and traditional Japanese paintings use flat color, clear edges, tactile surfaces, and careful spacing to create atmosphere. I then translated those qualities into toon-shaded forms, ink-wash shadows, woven surfaces, procedural flowers, and tendrils that grow across the posed body.</p>
+<p>This chapter started with visual observation: how <em>Akira</em> and traditional Japanese paintings use flat color, clear edges, tactile surfaces, and careful spacing to create atmosphere. Those observations became toon-shaded forms, ink-wash shadows, woven surfaces, procedural flowers, and tendrils that grow across the posed body.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The process taught me how to turn observation into a working system. Instead of copying a reference, I had to identify what created its feeling and find a practical way to reproduce that quality in real-time 3D. The field rules, flower lifecycles, packed data, tendril routes, culling, level of detail, and lightweight shadow proxies all had to support a clear visual or narrative goal. The most difficult part was balancing visual richness with performance: I wanted the scene to feel dense, tactile, and alive, but every additional vertices, instances, shadow, and layer of detail had a cost.</p>
+<p>The process taught me how to turn observation into a working system. Rather than copying a reference, the challenge was to identify what created its feeling and find a practical way to reproduce that quality in real-time 3D. The field rules, flower lifecycles, packed data, tendril routes, culling, level of detail, and lightweight shadow proxies all had to support a clear visual or narrative goal. The most difficult part was balancing visual richness with performance: the scene needed to feel dense, tactile, and alive, but every additional vertex, instance, shadow, and layer of detail had a cost.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>For future chapters, I want to keep that curiosity and attention to observation. A new story may lead me toward a different visual direction, while a visual experiment may reveal a story I had not considered before.</p>
+<p>Future chapters will keep that curiosity and attention to observation. A new story may lead toward a different visual direction, while a visual experiment may reveal an unexpected story.</p>
 <!-- /wp:paragraph -->
