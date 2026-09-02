@@ -126,9 +126,15 @@ return mix(bg, shColor, max(wash.mul(washStr), line.mul(contourStr)));</code></p
 <p>Beyond the ground wash, I also wanted the flowers to cast shadows on the character without casting them onto themselves. For that, I use a second shadow map containing only the flowers: their casters use a separate layer, and the plant-shadow light's shadow camera is restricted to it. The light shares the main light's position but has zero intensity, so it writes depth without adding visible light and keeps the character out of the map.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:paragraph -->
+<!-- <p>The low-poly VAT mesh also serves as a shadow-only proxy on a separate render layer, so the shadow passes do not need the full petal geometry.</p> -->
+<!-- /wp:paragraph -->
+
+
 <!-- wp:video {"id":120252} -->
 <figure class="wp-block-video"><video autoplay loop muted src="https://tympanus.net/codrops/wp-content/uploads/2026/09/demo-shadow-on-character-1080p.mp4" playsinline></video></figure>
 <!-- /wp:video -->
+
 
 <!-- wp:heading {"level":4} -->
 <h4 class="wp-block-heading">Silk Weave</h4>
@@ -424,18 +430,6 @@ placed = attach.add(leafPos.mul(growFrac));</code></pre>
 
 <!-- wp:paragraph -->
 <p>The body and backpack use the same host and routing pipeline. The body carries most of the routes, while the backpack adds a lighter contact layer. Plumera heads bind to active wraps, giving the suit its own flower type within the field.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Flower LOD Across Backends</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>I reuse the culling and LOD pattern from <em>False Earth</em> for animated VAT flowers, with the high- and low-poly meshes sharing the same per-head state. On iPhone, the indirect path still submitted both LOD meshes. For Apple touch devices and the WebGL2 fallback, I select the visible band on the CPU, clear the indirect buffer, and set <code>Mesh.count</code>.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>The low-poly VAT mesh also serves as a shadow-only proxy on a separate render layer, so the shadow passes do not need the full petal geometry.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
